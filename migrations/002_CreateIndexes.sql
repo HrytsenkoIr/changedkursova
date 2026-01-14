@@ -1,0 +1,9 @@
+CREATE NONCLUSTERED INDEX IX_Customer_Email ON Customer(Email);
+CREATE NONCLUSTERED INDEX IX_Product_CategoryID ON Product(CategoryID);
+CREATE NONCLUSTERED INDEX IX_Product_Name ON Product(Name);
+CREATE NONCLUSTERED INDEX IX_Orders_CustomerID ON Orders(CustomerID);
+CREATE NONCLUSTERED INDEX IX_Orders_OrderDate ON Orders(OrderDate DESC);
+CREATE NONCLUSTERED INDEX IX_OrderItem_OrderID ON OrderItem(OrderID);
+CREATE NONCLUSTERED INDEX IX_OrderItem_ProductID ON OrderItem(ProductID);
+CREATE NONCLUSTERED INDEX IX_Payment_OrderID ON Payment(OrderID);
+CREATE NONCLUSTERED INDEX IX_Delivery_OrderID ON Delivery(OrderID);
