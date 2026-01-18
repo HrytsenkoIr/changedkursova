@@ -1,91 +1,129 @@
-using Microsoft.Data.SqlClient;
-using OnlineStore.Models;
-using OnlineStore.Services;
+using Microsoft.EntityFrameworkCore;
+using OnlineStoreSystem.EFModels;
+using OnlineStoreSystem.Repositories.Interfaces;
 
-namespace OnlineStore.Repositories;
+namespace OnlineStoreSystem.Repositories;
 
 public class ProductRepository : IProductRepository
 {
-    private readonly DatabaseConnection _db;
+    private readonly OnlineStoreDbContext _context;
 
-    public ProductRepository(DatabaseConnection db) => _db = db;
-
-    public async Task<int> CreateAsync(Product p, CancellationToken ct = default)
+    public ProductRepository(OnlineStoreDbContext context)
     {
-        const string sql = "INSERT INTO Product (Name, Description, Price, Stock, CategoryID) VALUES (@Name, @Desc, @Price, @Stock, @Cat); SELECT CAST(SCOPE_IDENTITY() AS INT);";
-        await using var conn = _db.CreateConnection();
-        await conn.OpenAsync(ct);
-        await using var cmd = new SqlCommand(sql, conn);
-        cmd.Parameters.AddWithValue("@Name", p.Name);
-        cmd.Parameters.AddWithValue("@Desc", (object?)p.Description ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@Price", p.Price);
-        cmd.Parameters.AddWithValue("@Stock", p.Stock);
-        cmd.Parameters.AddWithValue("@Cat", p.CategoryID);
-        var result = await cmd.ExecuteScalarAsync(ct);
-        return result != null ? Convert.ToInt32(result) : 0;
+        _context = context;
+    }
+
+    public async Task<int> CreateAsync(Product product, CancellationToken ct = default)
+    {
+        await _context.Products.AddAsync(product, ct);
+        await _context.SaveChangesAsync(ct);
+        return product.ProductId;
     }
 
     public async Task<Product?> GetByIdAsync(int id, CancellationToken ct = default)
     {
-        const string sql = "SELECT ProductID, Name, Description, Price, Stock, CategoryID FROM Product WHERE ProductID = @id";
-        await using var conn = _db.CreateConnection();
-        await conn.OpenAsync(ct);
-        await using var cmd = new SqlCommand(sql, conn);
-        cmd.Parameters.AddWithValue("@id", id);
-        await using var r = await cmd.ExecuteReaderAsync(ct);
-        if (await r.ReadAsync(ct))
-            return new Product
-            {
-                ProductID = r.GetInt32(0),
-                Name = r.GetString(1),
-                Description = r.IsDBNull(2) ? null : r.GetString(2),
-                Price = r.GetDecimal(3),
-                Stock = r.GetInt32(4),
-                CategoryID = r.GetInt32(5)
-            };
-        return null;
+        return await _context.Products.FindAsync(new object[] { id }, ct);
     }
 
-    public async Task<List<Product>> GetAllAsync(CancellationToken ct = default)
+    public async Task<Product?> GetByIdWithOrdersAsync(int id, CancellationToken ct = default)
     {
-        const string sql = "SELECT ProductID, Name, Description, Price, Stock, CategoryID FROM Product";
-        var list = new List<Product>();
-        await using var conn = _db.CreateConnection();
-        await conn.OpenAsync(ct);
-        await using var cmd = new SqlCommand(sql, conn);
-        await using var r = await cmd.ExecuteReaderAsync(ct);
-        while (await r.ReadAsync(ct))
-            list.Add(new Product
-            {
-                ProductID = r.GetInt32(0),
-                Name = r.GetString(1),
-                Description = r.IsDBNull(2) ? null : r.GetString(2),
-                Price = r.GetDecimal(3),
-                Stock = r.GetInt32(4),
-                CategoryID = r.GetInt32(5)
-            });
-        return list;
+        return await _context.Products
+            .Include(p => p.Category)
+            .Include(p => p.OrderItems)
+                .ThenInclude(oi => oi.Order)
+                .ThenInclude(o => o.Payments)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.ProductId == id, ct);
+    }
+
+    public async Task<List<Product>> GetAllAsync(bool trackChanges = false, CancellationToken ct = default)
+    {
+        var query = _context.Products.AsQueryable();
+
+        if (!trackChanges)
+            query = query.AsNoTracking();
+
+        return await query.ToListAsync(ct);
     }
 
     public async Task<List<Product>> GetWithCategoriesAsync(CancellationToken ct = default)
     {
-        const string sql = "SELECT p.ProductID, p.Name, p.Description, p.Price, p.Stock, p.CategoryID, c.Name FROM Product p INNER JOIN Category c ON p.CategoryID = c.CategoryID";
-        var list = new List<Product>();
-        await using var conn = _db.CreateConnection();
-        await conn.OpenAsync(ct);
-        await using var cmd = new SqlCommand(sql, conn);
-        await using var r = await cmd.ExecuteReaderAsync(ct);
-        while (await r.ReadAsync(ct))
-            list.Add(new Product
+        return await _context.Products
+            .Include(p => p.Category)
+            .AsNoTracking()
+            .ToListAsync(ct);
+    }
+
+    public async Task<List<Product>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken ct = default)
+    {
+        return await _context.Products
+            .AsNoTracking()
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+    }
+
+    public async Task UpdateAsync(Product product, CancellationToken ct = default)
+    {
+        var existing = await _context.Products.FindAsync(new object[] { product.ProductId }, ct);
+        if (existing == null)
+            throw new KeyNotFoundException("Product not found");
+
+        existing.Name = product.Name;
+        existing.Description = product.Description;
+        existing.Price = product.Price;
+        existing.Stock = product.Stock;
+        existing.CategoryId = product.CategoryId;
+        existing.Status = product.Status;
+        existing.Metadata = product.Metadata;
+
+        await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task UpdateDetachedAsync(Product product, CancellationToken ct = default)
+    {
+        _context.Attach(product);
+        _context.Entry(product).State = EntityState.Modified;
+        await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task DeleteAsync(int id, CancellationToken ct = default)
+    {
+        await _context.Database.ExecuteSqlRawAsync(
+            "DELETE FROM Product WHERE ProductID = {0}",
+            new object[] { id },
+            ct);
+    }
+
+    public async Task<List<Product>> GetFilteredAsync(
+        decimal? minPrice,
+        decimal? maxPrice,
+        int? categoryId,
+        CancellationToken ct = default)
+    {
+        var query = _context.Products.AsQueryable();
+
+        if (minPrice.HasValue)
+            query = query.Where(p => p.Price >= minPrice.Value);
+
+        if (maxPrice.HasValue)
+            query = query.Where(p => p.Price <= maxPrice.Value);
+
+        if (categoryId.HasValue)
+            query = query.Where(p => p.CategoryId == categoryId.Value);
+
+        return await query.AsNoTracking().ToListAsync(ct);
+    }
+
+    public async Task<Dictionary<int, decimal>> GetSalesStatsAsync(CancellationToken ct = default)
+    {
+        return await _context.OrderItems
+            .GroupBy(oi => oi.ProductId)
+            .Select(g => new
             {
-                ProductID = r.GetInt32(0),
-                Name = r.GetString(1),
-                Description = r.IsDBNull(2) ? null : r.GetString(2),
-                Price = r.GetDecimal(3),
-                Stock = r.GetInt32(4),
-                CategoryID = r.GetInt32(5),
-                CategoryName = r.GetString(6)
-            });
-        return list;
+                ProductId = g.Key,
+                TotalRevenue = g.Sum(x => x.Price * x.Amount)
+            })
+            .ToDictionaryAsync(x => x.ProductId, x => x.TotalRevenue, ct);
     }
 }

@@ -1,0 +1,88 @@
+
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+
+body {
+    background-color: #0d0d0d !important;
+    background-image: url('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ZHUzc29waTdldzZkdmc4cjYxcG5xbms4dDJvdGo2NTFhNTQ2NWV2cCZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/26n6G8lRMOrYC6rFS/giphy.gif') !important;
+    background-size: cover !important;
+    background-attachment: fixed !important;
+    background-position: center !important;
+    color: #e0d9ff !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+
+.container,
+.container-fluid {
+    background: transparent !important;
+}
+
+
+.card {
+    background-color: rgba(25, 0, 50, 0.85) !important;
+    border: 1px solid #5500aa !important;
+    color: #e0d9ff !important;
+    box-shadow: 0 4px 20px rgba(85, 0, 170, 0.6) !important;
+}
+
+
+.card-header {
+    background: transparent !important;
+    border-bottom: 1px solid #5500aa !important;
+    color: #e0d9ff !important;
+}
+
+
+.table {
+    color: #e0d9ff !important;
+}
+
+
+.badge {
+    background-color: #5500aa !important;
+    color: #fff !important;
+}
+
+
+.btn,
+.btn-primary,
+.btn-success,
+.btn-warning,
+.btn-info {
+    background: linear-gradient(45deg, #6a0dad, #a64ca6) !important;
+    border: none !important;
+    color: #fff !important;
+}
+
+
+.footer {
+    background-color: rgba(20, 0, 50, 0.9) !important;
+    color: #e0d9ff !important;
+    border-top: 1px solid #5500aa !important;
+}
+
+.magic-navbar {
+    background-color: rgba(10, 0, 25, 0.7) !important; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+}
+
+
+.magic-navbar .nav-link {
+    color: #d9b3ff !important;
+    transition: color 0.3s;
+}
+
+.magic-navbar .nav-link.active,
+.magic-navbar .nav-link:hover {
+    color: #ffccff !important;
+    text-shadow: 0 0 8px #aa00ff;
+}
+
+.magic-navbar .navbar-brand {
+    color: #e0d9ff !important;
+}

@@ -1,0 +1,177 @@
+@model OnlineStoreSystem.EFModels.Customer
+@{
+    ViewData["Title"] = $"Клієнт: {Model.Name}";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Інформація про клієнта</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">ID:</dt>
+                    <dd class="col-sm-9">@Model.CustomerId</dd>
+
+                    <dt class="col-sm-3">ПІБ:</dt>
+                    <dd class="col-sm-9"><strong>@Model.Name</strong></dd>
+
+                    <dt class="col-sm-3">Email:</dt>
+                    <dd class="col-sm-9">
+                        <a href="mailto:@Model.Email" class="text-decoration-none">
+                            @Model.Email
+                        </a>
+                    </dd>
+
+                    <dt class="col-sm-3">Телефон:</dt>
+                    <dd class="col-sm-9">
+                        <a href="tel:@Model.Phone" class="text-decoration-none">
+                             @Model.Phone
+                        </a>
+                    </dd>
+
+                    <dt class="col-sm-3">Адреса:</dt>
+                    <dd class="col-sm-9">
+                        @if (Model.Address != null)
+                        {
+                            <div>
+                                <strong>Вулиця:</strong> @Model.Address.Street<br />
+                                <strong>Місто:</strong> @Model.Address.City<br />
+                                <strong>Поштовий код:</strong> @Model.Address.ZipCode
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Не вказано</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-3">Дата створення:</dt>
+                    <dd class="col-sm-9">
+                        @(Model is dynamic && ((dynamic)Model).CreatedAt != null ? ((DateTime)((dynamic)Model).CreatedAt).ToString("dd.MM.yyyy HH:mm") : "Не вказано")
+                    </dd>
+                </dl>
+            </div>
+            <div class="card-footer">
+                <div class="btn-group">
+                    <a asp-action="Edit" asp-route-id="@Model.CustomerId" class="btn btn-warning">
+                        Редагувати
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.CustomerId" class="btn btn-danger">
+                        Видалити
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Назад до списку
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Статистика замовлень</h5>
+            </div>
+            <div class="card-body">
+                @{
+                    var orders = Model.Orders?.ToList() ?? new List<Order>();
+                    var totalOrders = orders.Count;
+                    var totalSpent = orders.Sum(o => o.OrderItems?.Sum(oi => oi.Price * oi.Amount) ?? 0);
+                    var lastOrder = orders.OrderByDescending(o => o.OrderDate).FirstOrDefault();
+                }
+                
+                <dl class="row mb-0">
+                    <dt class="col-sm-6">Всього замовлень:</dt>
+                    <dd class="col-sm-6"><strong>@totalOrders</strong></dd>
+
+                    <dt class="col-sm-6">Сума витрат:</dt>
+                    <dd class="col-sm-6"><strong>@totalSpent.ToString("C")</strong></dd>
+
+                    <dt class="col-sm-6">Останнє замовлення:</dt>
+                    <dd class="col-sm-6">
+                        @if (lastOrder != null)
+                        {
+                            <small>#@lastOrder.OrderId (@lastOrder.OrderDate.ToString("dd.MM"))</small>
+                        }
+                        else
+                        {
+                            <small class="text-muted">Немає</small>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (orders.Any())
+{
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Останні замовлення</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                            <th>Сума</th>
+                            <th>Товари</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in orders.Take(5))
+                        {
+                            var totalAmount = order.OrderItems?.Sum(oi => oi.Price * oi.Amount) ?? 0;
+                            <tr>
+                                <td>#@order.OrderId</td>
+                                <td>@order.OrderDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>
+                                    <span class="badge @GetStatusBadge(order.Status)">
+                                        @order.Status
+                                    </span>
+                                </td>
+                                <td>@totalAmount.ToString("C")</td>
+                                <td>@(order.OrderItems?.Count() ?? 0) шт.</td>
+                                <td>
+                                    <a asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" 
+                                       class="btn btn-sm btn-info">Переглянути</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (orders.Count > 5)
+            {
+                <div class="text-center mt-2">
+                    <a asp-controller="Order" asp-action="Index" asp-route-customerId="@Model.CustomerId" 
+                       class="btn btn-sm btn-outline-primary">
+                        Показати всі замовлення (@orders.Count)
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@functions {
+    string GetStatusBadge(string status)
+    {
+        return status switch
+        {
+            "Paid" => "bg-success",
+            "Pending" => "bg-warning",
+            "Cancelled" => "bg-danger",
+            "Payment on Delivery" => "bg-info",
+            "Refunded" => "bg-secondary",
+            _ => "bg-light text-dark"
+        };
+    }
+}

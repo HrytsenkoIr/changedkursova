@@ -1,12 +1,12 @@
-using OnlineStore.Models;
+using OnlineStoreSystem.EFModels;
 
-namespace OnlineStore.Repositories;
+namespace OnlineStoreSystem.Repositories;
 
 public interface ICustomerRepository
 {
-    Task<int> CreateAsync(Customer customer, CancellationToken ct = default);
+    Task<Customer> CreateAsync(Customer customer, CancellationToken ct = default);
     Task<Customer?> GetByIdAsync(int id, CancellationToken ct = default);
-    Task<List<Customer>> GetAllAsync(CancellationToken ct = default);
-    Task<bool> UpdateAsync(Customer customer, CancellationToken ct = default);
-    Task<bool> DeleteAsync(int id, CancellationToken ct = default);
+    Task<List<Customer>> GetAllAsync(bool trackChanges = false, CancellationToken ct = default);
+    Task UpdateAsync(Customer customer, CancellationToken ct = default);
+    Task DeleteAsync(int id, CancellationToken ct = default);
 }

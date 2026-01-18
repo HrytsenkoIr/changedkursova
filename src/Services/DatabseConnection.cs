@@ -1,7 +1,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
-namespace OnlineStore.Services;
+namespace OnlineStoreSystem.Services;
 
 public class DatabaseConnection
 {

@@ -1,8 +1,8 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
-using OnlineStore.Services;
+using OnlineStoreSystem.Services;
 
-namespace OnlineStore.Services;
+namespace OnlineStoreSystem.Services;
 
 public class StoredProcedureService
 {

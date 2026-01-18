@@ -1,0 +1,53 @@
+@model OnlineStoreSystem.EFModels.Category
+@{
+    ViewData["Title"] = "Додати категорію";
+    var canAccess = User.IsInRole("Admin");
+}
+
+@if (canAccess)
+{
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Додати нову категорію</h4>
+                </div>
+
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <h5 class="mb-3">Основна інформація</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Назва категорії *</label>
+                            <input asp-for="Name"
+                                   class="form-control"
+                                   placeholder="Введіть назву категорії" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                Скасувати
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                Створити категорію
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        У вас немає доступу до цієї сторінки.
+    </div>
+}
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

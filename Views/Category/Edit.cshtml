@@ -1,0 +1,47 @@
+@model OnlineStoreSystem.EFModels.Category
+@{
+    ViewData["Title"] = $"Редагування: {Model.Name}";
+    var canAccess = User.IsInRole("Admin");
+}
+
+@if (canAccess)
+{
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0">Редагувати категорію</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="CategoryId" />
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Назва категорії *</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Details" asp-route-id="@Model.CategoryId" class="btn btn-secondary">
+                                ← Скасувати
+                            </a>
+                            <button type="submit" class="btn btn-warning">Зберегти зміни</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        У вас немає доступу до цієї сторінки.
+    </div>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

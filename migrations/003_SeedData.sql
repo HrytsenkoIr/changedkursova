@@ -1,5 +1,4 @@
--- 003_SeedData.sql
--- Seed ONLY if database is empty (safe for real project)
+
 
 IF EXISTS (SELECT 1 FROM Category)
 BEGIN
@@ -7,9 +6,9 @@ BEGIN
     RETURN;
 END
 
------------------------------------------------------------
+
 -- КАТЕГОРІЇ
------------------------------------------------------------
+
 SET IDENTITY_INSERT Category ON;
 INSERT INTO Category (CategoryID, Name) VALUES
 (1, 'Magic Potions'), (2, 'Herbs & Ingredients'), (3, 'Crystals & Stones'),
@@ -19,36 +18,36 @@ INSERT INTO Category (CategoryID, Name) VALUES
 (13, 'Herbal Manuals'), (14, 'Ritual Guides');
 SET IDENTITY_INSERT Category OFF;
 
------------------------------------------------------------
+
 -- КЛІЄНТИ
------------------------------------------------------------
+
 SET IDENTITY_INSERT Customer ON;
-INSERT INTO Customer (CustomerID, Name, Email, Phone, Address) VALUES
-(1, 'Alexander Ivanov', 'ivanov@gmail.com', '380671234567', 'Kyiv, Khreshchatyk St, 10'),
-(2, 'Maria Petrenko', 'petrenko.m@gmail.com', '380931112233', 'Lviv, Doroshenka St, 5'),
-(3, 'Ihor Kovalenko', 'kovalenko.igor@gmail.com', '380501234987', 'Kharkiv, Nauky Ave, 23'),
-(4, 'Olena Shevchenko', 'shevchenko.olena@gmail.com', '380971234555', 'Dnipro, Polya St, 12'),
-(5, 'Serhiy Bondar', 'bondar.sergiy@gmail.com', '380631234789', 'Odesa, Deribasivska St, 1'),
-(6, 'Tetiana Melnyk', 'melnyk.tanya@gmail.com', '380991234111', 'Zaporizhzhia, Soborna St, 45'),
-(7, 'Volodymyr Hnatyuk', 'hnatyuk.v@gmail.com', '380671111222', 'Chernivtsi, Holovna St, 100'),
-(8, 'Natalia Romanyuk', 'romanyuk.n@gmail.com', '380933331234', 'Vinnytsia, Keletska St, 34'),
-(9, 'Dmytro Sydorenko', 'sydorenko.d@gmail.com', '380501231231', 'Poltava, Yevropeiska St, 15'),
-(10, 'Inna Lysenko', 'lysenko.inna@gmail.com', '380671212121', 'Kropyvnytskyi, Perspektyvna St, 8'),
-(11, 'Andrii Marchenko', 'marchenko.andrii@gmail.com', '380631239999', 'Sumy, Kharkivska St, 22'),
-(12, 'Larysa Danylko', 'larysa.danylko@gmail.com', '380991117777', 'Chernihiv, Myru Ave, 101'),
-(13, 'Petro Kravets', 'kravets.petro@gmail.com', '380501235555', 'Rivne, Soborna St, 9'),
-(14, 'Yulia Tkachenko', 'tkachenko.yulia@gmail.com', '380671236666', 'Lutsk, Lesi Ukrainky St, 3'),
-(15, 'Viktor Andrusyak', 'andrusyak.v@gmail.com', '380931110000', 'Ivano-Frankivsk, Nezalezhnosti St, 18'),
-(16, 'Iryna Kravchuk', 'iryna.kravchuk@gmail.com', '380671234321', 'Zhytomyr, Kyivska St, 24'),
-(17, 'Kateryna Polischuk', 'katya.polischuk@gmail.com', '380991231010', 'Ternopil, Ruska St, 12'),
-(18, 'Oleksandr Veres', 'veres.o@gmail.com', '380501239111', 'Uzhhorod, Shandora Petefi Sq, 4'),
-(19, 'Halyna Boiko', 'boiko.halyna@gmail.com', '380931234444', 'Cherkasy, Shevchenka Blvd, 99'),
-(20, 'Roman Doroshenko', 'roman.doro@gmail.com', '380631234555', 'Mykolaiv, Central Ave, 76');
+INSERT INTO Customer (CustomerID, Name, Email, Phone, Address_Street, Address_City, Address_ZipCode) VALUES
+(1, 'Alexander Ivanov', 'ivanov@gmail.com', '380671234567', 'Khreshchatyk St, 10', 'Kyiv', NULL),
+(2, 'Maria Petrenko', 'petrenko.m@gmail.com', '380931112233', 'Doroshenka St, 5', 'Lviv', NULL),
+(3, 'Ihor Kovalenko', 'kovalenko.igor@gmail.com', '380501234987', 'Nauky Ave, 23', 'Kharkiv', NULL),
+(4, 'Olena Shevchenko', 'shevchenko.olena@gmail.com', '380971234555', 'Polya St, 12', 'Dnipro', NULL),
+(5, 'Serhiy Bondar', 'bondar.sergiy@gmail.com', '380631234789', 'Deribasivska St, 1', 'Odesa', NULL),
+(6, 'Tetiana Melnyk', 'melnyk.tanya@gmail.com', '380991234111', 'Soborna St, 45', 'Zaporizhzhia', NULL),
+(7, 'Volodymyr Hnatyuk', 'hnatyuk.v@gmail.com', '380671111222', 'Holovna St, 100', 'Chernivtsi', NULL),
+(8, 'Natalia Romanyuk', 'romanyuk.n@gmail.com', '380933331234', 'Keletska St, 34', 'Vinnytsia', NULL),
+(9, 'Dmytro Sydorenko', 'sydorenko.d@gmail.com', '380501231231', 'Yevropeiska St, 15', 'Poltava', NULL),
+(10, 'Inna Lysenko', 'lysenko.inna@gmail.com', '380671212121', 'Perspektyvna St, 8', 'Kropyvnytskyi', NULL),
+(11, 'Andrii Marchenko', 'marchenko.andrii@gmail.com', '380631239999', 'Kharkivska St, 22', 'Sumy', NULL),
+(12, 'Larysa Danylko', 'larysa.danylko@gmail.com', '380991117777', 'Myru Ave, 101', 'Chernihiv', NULL),
+(13, 'Petro Kravets', 'kravets.petro@gmail.com', '380501235555', 'Soborna St, 9', 'Rivne', NULL),
+(14, 'Yulia Tkachenko', 'tkachenko.yulia@gmail.com', '380671236666', 'Lesi Ukrainky St, 3', 'Lutsk', NULL),
+(15, 'Viktor Andrusyak', 'andrusyak.v@gmail.com', '380931110000', 'Nezalezhnosti St, 18', 'Ivano-Frankivsk', NULL),
+(16, 'Iryna Kravchuk', 'iryna.kravchuk@gmail.com', '380671234321', 'Kyivska St, 24', 'Zhytomyr', NULL),
+(17, 'Kateryna Polischuk', 'katya.polischuk@gmail.com', '380991231010', 'Ruska St, 12', 'Ternopil', NULL),
+(18, 'Oleksandr Veres', 'veres.o@gmail.com', '380501239111', 'Shandora Petefi Sq, 4', 'Uzhhorod', NULL),
+(19, 'Halyna Boiko', 'boiko.halyna@gmail.com', '380931234444', 'Shevchenka Blvd, 99', 'Cherkasy', NULL),
+(20, 'Roman Doroshenko', 'roman.doro@gmail.com', '380631234555', 'Central Ave, 76', 'Mykolaiv', NULL);
 SET IDENTITY_INSERT Customer OFF;
 
------------------------------------------------------------
+
 -- ПРОДУКТИ
------------------------------------------------------------
+
 SET IDENTITY_INSERT Product ON;
 INSERT INTO Product (ProductID, Name, Description, Price, Stock, CategoryID) VALUES
 (1, 'Love Elixir', 'Potion to make someone love you.', 499.00, 25, 1),
@@ -73,9 +72,9 @@ INSERT INTO Product (ProductID, Name, Description, Price, Stock, CategoryID) VAL
 (20, 'Witch Hat', 'Hat that helps you focus in magic.', 299.00, 12, 9);
 SET IDENTITY_INSERT Product OFF;
 
------------------------------------------------------------
+
 -- ЗАМОВЛЕННЯ
------------------------------------------------------------
+
 SET IDENTITY_INSERT Orders ON;
 INSERT INTO Orders (OrderID, CustomerID, OrderDate, Status) VALUES
 (1, 1, GETDATE(), 'Payment on Delivery'),
@@ -100,9 +99,9 @@ INSERT INTO Orders (OrderID, CustomerID, OrderDate, Status) VALUES
 (20, 9, GETDATE(), 'Refunded');
 SET IDENTITY_INSERT Orders OFF;
 
------------------------------------------------------------
+
 -- ДОСТАВКА
------------------------------------------------------------
+
 INSERT INTO Delivery (OrderID, Type, Cost, Status) VALUES
 (1, 'Courier', 150.00, 'Pending Shipment'),
 (2, 'Pickup', 0.00, 'Delivered'),
@@ -125,9 +124,9 @@ INSERT INTO Delivery (OrderID, Type, Cost, Status) VALUES
 (19, 'Courier', 150.00, 'Pending Shipment'),
 (20, 'Courier', 150.00, 'Returned');
 
------------------------------------------------------------
+
 -- ЗАМОВЛЕНІ ТОВАРИ
------------------------------------------------------------
+
 INSERT INTO OrderItem (OrderID, ProductID, Amount, Price) VALUES
 (1, 1, 1, 499.00), (1, 7, 1, 599.00), (2, 2, 1, 899.00), (3, 3, 1, 699.00),
 (4, 5, 1, 399.00), (5, 9, 1, 1499.00), (6, 6, 1, 249.00), (7, 10, 1, 1999.00),
@@ -136,9 +135,9 @@ INSERT INTO OrderItem (OrderID, ProductID, Amount, Price) VALUES
 (15, 8, 1, 899.00), (16, 9, 1, 1499.00), (17, 10, 2, 3998.00), (18, 6, 1, 249.00),
 (19, 3, 1, 699.00), (20, 5, 2, 798.00);
 
------------------------------------------------------------
+
 -- ОПЛАТИ
------------------------------------------------------------
+
 WITH PaymentData AS (
     SELECT o.OrderID,
     CASE o.OrderID

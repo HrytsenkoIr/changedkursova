@@ -1,0 +1,29 @@
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Видалення</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="deleteModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+                <form id="deleteForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Видалити</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openDeleteModal(url, title, entityName) {
+        $('#deleteModalLabel').text(title);
+        $('#deleteModalBody').html(`<p>Ви впевнені, що хочете видалити "${entityName}"?</p><p class="text-danger"><small>Цю дію неможливо скасувати.</small></p>`);
+        
+        $('#deleteForm').attr('action', url);
+        $('#deleteModal').modal('show');
+    }
+</script>

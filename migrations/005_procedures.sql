@@ -1,4 +1,3 @@
--- 005_procedures.sql
 
 -- 1. sp_PlaceOrder
 IF OBJECT_ID('sp_PlaceOrder', 'P') IS NOT NULL DROP PROCEDURE sp_PlaceOrder;

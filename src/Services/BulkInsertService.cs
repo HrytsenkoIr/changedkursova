@@ -3,7 +3,7 @@ using OnlineStore.Models;
 using System.Diagnostics;
 using System.Text;
 
-namespace OnlineStore.Services;
+namespace OnlineStoreSystem.Services;
 
 public class BulkInsertService
 {

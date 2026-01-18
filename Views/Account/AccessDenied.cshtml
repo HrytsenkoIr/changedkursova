@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Доступ заборонено";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                Доступ заборонено
+            </div>
+            <div class="card-body text-center">
+                <p class="mb-3">
+                    У вас немає прав для доступу до цієї сторінки.
+                </p>
+
+                <a asp-controller="Home" asp-action="Index"
+                   class="btn btn-secondary">
+                    На головну
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,120 @@
+@model OnlineStoreSystem.EFModels.Customer
+@{
+    ViewData["Title"] = $"Видалення клієнта: {Model.Name}";
+
+
+    bool hasOrders = ViewBag.HasOrders != null && (bool)ViewBag.HasOrders;
+    int orderCount = ViewBag.OrderCount != null ? (int)ViewBag.OrderCount : 0;
+
+    var canAccess = User.IsInRole("Admin");
+}
+
+@if (canAccess)
+{
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"> Видалення клієнта</h4>
+                </div>
+                <div class="card-body">
+                    @if (hasOrders)
+                    {
+                        <div class="alert alert-danger">
+                            <h5 class="alert-heading"> Неможливо видалити!</h5>
+                            <p>У клієнта "<strong>@Model.Name</strong>" є активні замовлення.</p>
+                            <p><strong>Кількість замовлень:</strong> @orderCount</p>
+                            <p class="mb-0">Спочатку видаліть або завершіть всі замовлення цього клієнта.</p>
+                        </div>
+
+                        
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <a asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-secondary">
+                                 Повернутись до деталей
+                            </a>
+                            <a asp-action="Index" class="btn btn-primary">
+                                 Список клієнтів
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <h5 class="alert-heading"> Увага!</h5>
+                            <p>Ви збираєтесь видалити клієнта "<strong>@Model.Name</strong>".</p>
+                            <p class="mb-0">Цю дію неможливо скасувати!</p>
+                        </div>
+
+                        <h5>Деталі клієнта:</h5>
+                        <dl class="row">
+                            <dt class="col-sm-3">ID:</dt>
+                            <dd class="col-sm-9">@Model.CustomerId</dd>
+
+                            <dt class="col-sm-3">ПІБ:</dt>
+                            <dd class="col-sm-9">@Model.Name</dd>
+
+                            <dt class="col-sm-3">Email:</dt>
+                            <dd class="col-sm-9">@Model.Email</dd>
+
+                            <dt class="col-sm-3">Телефон:</dt>
+                            <dd class="col-sm-9">@Model.Phone</dd>
+
+                            <dt class="col-sm-3">Адреса:</dt>
+                            <dd class="col-sm-9">
+                                @if (Model.Address != null)
+                                {
+                                    <small>@Model.Address.Street, @Model.Address.City, @Model.Address.ZipCode</small>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Не вказано</span>
+                                }
+                            </dd>
+                        </dl>
+
+                        <div class="alert alert-warning">
+                            <ul class="mb-0">
+                                <li>Клієнт буде повністю видалено з бази даних</li>
+                            </ul>
+                        </div>
+
+                        <!-- Форма видалення на правильний метод POST -->
+                        <form asp-action="DeleteConfirmed" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.CustomerId" />
+
+                            <div class="d-flex justify-content-between mt-3">
+                                <a asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-secondary">
+                                     Скасувати та повернутись
+                                </a>
+                                <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">
+                                     Видалити назавжди
+                                </button>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Перехід на окрему сторінку з поясненням -->
+    @Html.ActionLink(
+        "Відсутній доступ – натисніть, щоб перейти на інформаційну сторінку",
+        "AccessDenied",     
+        "Home",             
+        null,
+        new { @class = "btn btn-danger mt-3" }
+    )
+}
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            return confirm('Ви впевнені, що хочете видалити цього клієнта назавжди? Цю дію неможливо скасувати!');
+        }
+    </script>
+}

@@ -1,0 +1,146 @@
+@using System.Linq
+@model IEnumerable<OnlineStoreSystem.EFModels.Customer>
+
+@{
+    ViewData["Title"] = "Клієнти";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Клієнти</h1>
+    <a asp-action="Create" class="btn btn-success">Додати клієнта</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+
+            <div class="col-md-3">
+                <input type="text"
+                       name="name"
+                       class="form-control"
+                       placeholder="Імʼя"
+                       value="@Context.Request.Query["name"]" />
+            </div>
+
+            <div class="col-md-3">
+                <input type="text"
+                       name="email"
+                       class="form-control"
+                       placeholder="Email"
+                       value="@Context.Request.Query["email"]" />
+            </div>
+
+            <div class="col-md-3">
+                <input type="text"
+                       name="phone"
+                       class="form-control"
+                       placeholder="Телефон"
+                       value="@Context.Request.Query["phone"]" />
+            </div>
+
+            <div class="col-md-3">
+                <input type="text"
+                       name="city"
+                       class="form-control"
+                       placeholder="Місто"
+                       value="@Context.Request.Query["city"]" />
+            </div>
+
+            <div class="col-md-3">
+                <input type="text"
+                       name="street"
+                       class="form-control"
+                       placeholder="Вулиця"
+                       value="@Context.Request.Query["street"]" />
+            </div>
+
+            <div class="col-md-3">
+                <input type="text"
+                       name="zip"
+                       class="form-control"
+                       placeholder="ZIP код"
+                       value="@Context.Request.Query["zip"]" />
+            </div>
+
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    Фільтрувати
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Ім'я</th>
+                <th>Email</th>
+                <th>Телефон</th>
+                <th>Адреса</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.CustomerId</td>
+                    <td>
+                        <strong>@item.Name</strong>
+                        <br />
+                        <small class="text-muted">ID: @item.CustomerId</small>
+                    </td>
+                    <td>
+                        <a href="mailto:@item.Email">@item.Email</a>
+                    </td>
+                    <td>@item.Phone</td>
+                    <td>
+                        @if (item.Address != null)
+                        {
+                            <small>
+                                @item.Address.Street,
+                                @item.Address.City,
+                                @item.Address.ZipCode
+                            </small>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Не вказано</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Details"
+                               asp-route-id="@item.CustomerId"
+                               class="btn btn-sm btn-info">
+                                Переглянути
+                            </a>
+                            <a asp-action="Edit"
+                               asp-route-id="@item.CustomerId"
+                               class="btn btn-sm btn-warning">
+                                Редагувати
+                            </a>
+                            <a asp-action="Delete"
+                               asp-route-id="@item.CustomerId"
+                               class="btn btn-sm btn-danger">
+                                Видалити
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center">
+        📭 Клієнти не знайдені.
+        <a asp-action="Create">Додати першого клієнта</a>
+    </div>
+}

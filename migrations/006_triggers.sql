@@ -93,3 +93,30 @@ BEGIN
     FROM inserted i;
 END');
 GO
+IF OBJECT_ID('trg_PreventDeleteProductWithOrders', 'TR') IS NOT NULL
+    DROP TRIGGER trg_PreventDeleteProductWithOrders;
+GO
+
+EXEC('
+CREATE TRIGGER trg_PreventDeleteProductWithOrders
+ON Product
+INSTEAD OF DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM OrderItem oi
+        WHERE oi.ProductID IN (SELECT ProductID FROM deleted)
+    )
+    BEGIN
+        RAISERROR(''Cannot delete a product that exists in orders!'', 16, 1);
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        RETURN;
+    END
+
+    DELETE FROM Product
+    WHERE ProductID IN (SELECT ProductID FROM deleted);
+END');
+GO

@@ -1,0 +1,75 @@
+@model OnlineStoreSystem.EFModels.Order
+@{
+    ViewData["Title"] = $"Видалення замовлення #{Model.OrderId}";
+    
+    var totalAmount = Model.OrderItems?.Sum(oi => oi.Price * oi.Amount) ?? 0;
+    var itemCount = Model.OrderItems?.Count() ?? 0;
+    
+    bool hasPayments = Model.Payments?.Any() == true;
+    bool hasDeliveries = Model.Deliveries?.Any() == true;
+    bool canDelete = true; 
+    
+    int paymentCount = Model.Payments?.Count() ?? 0;
+    int deliveryCount = Model.Deliveries?.Count() ?? 0;
+
+    var canAccess = User.IsInRole("Admin"); 
+}
+
+@if (canAccess)
+{
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Видалення замовлення #@Model.OrderId</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="DeleteConfirmed" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.OrderId" />
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="returnToStock" name="returnToStock" value="true" checked />
+                            <label class="form-check-label" for="returnToStock">
+                                Повернути товари на склад
+                            </label>
+                        </div>
+
+                        <dl class="row">
+                            <dt class="col-sm-3">ID:</dt>
+                            <dd class="col-sm-9">#@Model.OrderId</dd>
+
+                            <dt class="col-sm-3">Клієнт:</dt>
+                            <dd class="col-sm-9">
+                                <strong>@Model.Customer?.Name</strong><br />
+                                <small>@Model.Customer?.Email</small>
+                            </dd>
+
+                            <dt class="col-sm-3">Дата:</dt>
+                            <dd class="col-sm-9">@Model.OrderDate.ToString("dd.MM.yyyy HH:mm")</dd>
+
+                            <dt class="col-sm-3">Товари:</dt>
+                            <dd class="col-sm-9">
+                                @itemCount позицій, загальна сума: @totalAmount.ToString("C")
+                            </dd>
+                        </dl>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
+                            <button type="submit" class="btn btn-danger" 
+                                    onclick="return confirm('Ви впевнені? Цю дію неможливо скасувати!')">
+                                Видалити назавжди
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        У вас немає доступу до цієї сторінки.
+    </div>
+}

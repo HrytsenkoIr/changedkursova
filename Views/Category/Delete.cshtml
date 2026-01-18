@@ -1,0 +1,112 @@
+@model OnlineStoreSystem.EFModels.Category
+@{
+    ViewData["Title"] = $"Видалення категорії: {Model.Name}";
+
+    bool hasProducts = Model.Products != null && Model.Products.Any();
+    int productCount = Model.Products?.Count ?? 0;
+
+    var canAccess = User.IsInRole("Admin");
+}
+
+@if (canAccess)
+{
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Видалення категорії</h4>
+                </div>
+                <div class="card-body">
+
+                    @if (hasProducts)
+                    {
+                        <div class="alert alert-danger">
+                            <h5 class="alert-heading">Неможливо видалити!</h5>
+                            <p>У категорії "<strong>@Model.Name</strong>" є продукти.</p>
+                            <p><strong>Кількість продуктів:</strong> @productCount</p>
+                            <p class="mb-0">Спочатку видаліть або перенесіть усі продукти цієї категорії.</p>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6>Альтернативні дії:</h6>
+                            <ul class="mb-0">
+                                <li>Позначити категорію як "Видалено" (IsDeleted = true)</li>
+                                <li>Редагувати продукти та перенести їх у іншу категорію</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <a asp-action="Details" asp-route-id="@Model.CategoryId" class="btn btn-secondary">
+                                 Повернутись до деталей
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-warning">
+                                Позначити як видалену
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <h5 class="alert-heading">Увага!</h5>
+                            <p>Ви збираєтесь видалити категорію "<strong>@Model.Name</strong>".</p>
+                            <p class="mb-0">Цю дію неможливо скасувати!</p>
+                        </div>
+
+                        <h5>Деталі категорії:</h5>
+                        <dl class="row">
+                            <dt class="col-sm-3">ID:</dt>
+                            <dd class="col-sm-9">@Model.CategoryId</dd>
+
+                            <dt class="col-sm-3">Назва:</dt>
+                            <dd class="col-sm-9"><strong>@Model.Name</strong></dd>
+
+                            <dt class="col-sm-3">Кількість продуктів:</dt>
+                            <dd class="col-sm-9"><strong>@productCount</strong></dd>
+
+                            @if (productCount > 0)
+                            {
+                                <dt class="col-sm-3">Продукти:</dt>
+                                <dd class="col-sm-9">
+                                    <ul class="mb-0">
+                                        @foreach (var product in Model.Products)
+                                        {
+                                            <li>@product.Name</li>
+                                        }
+                                    </ul>
+                                </dd>
+                            }
+                        </dl>
+
+                        <form asp-action="Delete" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.CategoryId" />
+
+                            <div class="d-flex justify-content-between mt-3">
+                                <a asp-action="Details" asp-route-id="@Model.CategoryId" class="btn btn-secondary">
+                                    Скасувати та повернутись
+                                </a>
+                                <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">
+                                    Видалити назавжди
+                                </button>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        У вас немає доступу до цієї сторінки.
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            return confirm('Ви впевнені, що хочете видалити цю категорію назавжди? Цю дію неможливо скасувати!');
+        }
+    </script>
+}

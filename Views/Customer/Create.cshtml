@@ -1,0 +1,88 @@
+@model OnlineStoreSystem.ViewModels.CustomerCreateViewModel
+@{
+    ViewData["Title"] = "Додати клієнта";
+    var canAccess = User.IsInRole("Admin");
+}
+
+@if (canAccess)
+{
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"> Додати нового клієнта</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <h5 class="mb-3"> Основна інформація</h5>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">ПІБ *</label>
+                            <input asp-for="Name" class="form-control" placeholder="Введіть повне ім'я" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label">Email *</label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="example@email.com" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Phone" class="form-label">Телефон *</label>
+                                <input asp-for="Phone" class="form-control" placeholder="+380 XX XXX XXXX" />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3 mt-4"> Адреса</h5>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Address.Street" class="form-label">Вулиця</label>
+                            <input asp-for="Address.Street" class="form-control" placeholder="Вулиця, будинок, квартира" />
+                            <span asp-validation-for="Address.Street" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Address.City" class="form-label">Місто</label>
+                                <input asp-for="Address.City" class="form-control" placeholder="Назва міста" />
+                                <span asp-validation-for="Address.City" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Address.ZipCode" class="form-label">Поштовий код</label>
+                                <input asp-for="Address.ZipCode" class="form-control" placeholder="XXXXX" />
+                                <span asp-validation-for="Address.ZipCode" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary"> Скасувати</a>
+                            <button type="submit" class="btn btn-success"> Створити клієнта</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Перенаправлення на окрему сторінку з текстом про відсутність доступу -->
+    @Html.ActionLink(
+        "Відсутній доступ – натисніть, щоб перейти на інформаційну сторінку",
+        "AccessDenied",  
+        "Home",              
+        
+        null,
+        new { @class = "btn btn-danger mt-3" }
+    )
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,201 @@
+@model OnlineStoreSystem.EFModels.Product
+@{
+    ViewData["Title"] = $"Товар: {Model.Name}";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Інформація про товар</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">ID:</dt>
+                    <dd class="col-sm-9">@Model.ProductId</dd>
+
+                    <dt class="col-sm-3">Назва:</dt>
+                    <dd class="col-sm-9"><strong>@Model.Name</strong></dd>
+
+                    <dt class="col-sm-3">Опис:</dt>
+                    <dd class="col-sm-9">@(Model.Description ?? "Немає опису")</dd>
+
+                    <dt class="col-sm-3">Ціна:</dt>
+                    <dd class="col-sm-9">
+                        <span class="fs-5">@Model.Price.ToString("C")</span>
+                        @if (Model.DiscountedPrice.HasValue)
+                        {
+                            <span class="text-success ms-2">(Знижка: @Model.DiscountedPrice.Value.ToString("C"))</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-3">На складі:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge @(Model.Stock > 10 ? "bg-success" : Model.Stock > 0 ? "bg-warning" : "bg-danger") fs-6">
+                            @Model.Stock шт.
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-3">Категорія:</dt>
+                    <dd class="col-sm-9">
+                        @if (Model.Category != null)
+                        {
+                            <span class="badge bg-info">@Model.Category.Name</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Не вказано</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-3">Статус:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge @GetStatusBadge(Model.Status.ToString())">@Model.Status</span>
+                    </dd>
+
+                    <dt class="col-sm-3">Метадані:</dt>
+                    <dd class="col-sm-9">
+                        @if (Model.Metadata != null && Model.Metadata.Any())
+                        {
+                            <div class="bg-light p-2 rounded">
+                                <pre class="mb-0 small">
+@System.Text.Json.JsonSerializer.Serialize(Model.Metadata, new System.Text.Json.JsonSerializerOptions { WriteIndented = true })
+                                </pre>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Немає</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+            <div class="card-footer">
+                <div class="btn-group">
+                    <a asp-action="Edit" asp-route-id="@Model.ProductId" class="btn btn-warning">Редагувати</a>
+                    <a asp-action="Delete" asp-route-id="@Model.ProductId" class="btn btn-danger">Видалити</a>
+                    <a asp-action="Index" class="btn btn-secondary"> Назад до списку</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        @{
+            var orders = Model.OrderItems?.Select(oi => oi.Order).Distinct().OrderByDescending(o => o.OrderDate).ToList() ?? new List<Order>();
+            var totalOrders = orders.Count;
+            var totalSold = Model.OrderItems?.Sum(oi => oi.Amount) ?? 0m;
+            var totalRevenue = Model.OrderItems?.Sum(oi => oi.Price * oi.Amount) ?? 0m;
+            var lastOrder = orders.FirstOrDefault();
+        }
+
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <h5>Статистика замовлень</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-6">Всього замовлень:</dt>
+                    <dd class="col-sm-6"><strong>@totalOrders</strong></dd>
+
+                    <dt class="col-sm-6">Продано одиниць:</dt>
+                    <dd class="col-sm-6"><strong>@totalSold шт.</strong></dd>
+
+                    <dt class="col-sm-6">Виручка:</dt>
+                    <dd class="col-sm-6"><strong>@totalRevenue.ToString("C")</strong></dd>
+
+                    <dt class="col-sm-6">Останнє замовлення:</dt>
+                    <dd class="col-sm-6">
+                        @if (lastOrder != null)
+                        {
+                            <small>#@lastOrder.OrderId (@lastOrder.OrderDate.ToString("dd.MM"))</small>
+                        }
+                        else
+                        {
+                            <small class="text-muted">Немає</small>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (orders.Any())
+{
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5> Останні замовлення з цим товаром</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                            <th>Кількість</th>
+                            <th>Сума</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in orders.Take(5))
+                        {
+                            var itemsForProduct = order.OrderItems.Where(oi => oi.ProductId == Model.ProductId);
+                            var totalQty = itemsForProduct.Sum(oi => oi.Amount);
+                            var totalAmount = itemsForProduct.Sum(oi => oi.Price * oi.Amount);
+
+                            <tr>
+                                <td>#@order.OrderId</td>
+                                <td>@order.OrderDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td><span class="badge @GetStatusBadge(order.Status)">@order.Status</span></td>
+                                <td>@totalQty шт.</td>
+                                <td>@totalAmount.ToString("C")</td>
+                                <td>
+                                    <a asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-sm btn-info">Переглянути</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (orders.Count > 5)
+            {
+                <div class="text-center mt-2">
+                    <a asp-controller="Order" asp-action="Index" asp-route-productId="@Model.ProductId" class="btn btn-sm btn-outline-primary">
+                        Показати всі замовлення (@orders.Count)
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@functions {
+    string GetStatusBadge(string status)
+    {
+        return status switch
+        {
+            "Paid" => "bg-success",
+            "Pending" => "bg-warning",
+            "Cancelled" => "bg-danger",
+            "Payment on Delivery" => "bg-info",
+            "Refunded" => "bg-secondary",
+            _ => "bg-light text-dark"
+        };
+    }
+
+    string GetProductStatusBadge(string status)
+    {
+        return status switch
+        {
+            "Active" => "bg-success",
+            "Available" => "bg-primary",
+            "OutOfStock" => "bg-warning",
+            "Discontinued" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

@@ -1,0 +1,228 @@
+{
+  "Version": 1,
+  "Hash": "QgZ6KH47aFqW1ErmlfHmkbgGRnh03E2Wsk1Hv4ophOc=",
+  "Source": "OnlineStoreSystem",
+  "BasePath": "_content/OnlineStoreSystem",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "OnlineStoreSystem\\wwwroot",
+      "Source": "OnlineStoreSystem",
+      "ContentRoot": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\",
+      "BasePath": "_content/OnlineStoreSystem",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\css\\site.css",
+      "SourceId": "OnlineStoreSystem",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\",
+      "BasePath": "_content/OnlineStoreSystem",
+      "RelativePath": "css/site#[.{fingerprint}]?.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "6agfknryy2",
+      "Integrity": "LoAl++l82sZkNBdI2BfbHnQ+O3wzEEkNmS7uuJz/Uss=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\site.css"
+    },
+    {
+      "Identity": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\site.js",
+      "SourceId": "OnlineStoreSystem",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\",
+      "BasePath": "_content/OnlineStoreSystem",
+      "RelativePath": "site#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "mao6o7r8ou",
+      "Integrity": "gvugkBRVijuWtUwzTBTaVatWc7/C+6wEvPl6pqInFEI=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\site.js"
+    }
+  ],
+  "Endpoints": [
+    {
+      "Route": "css/site.6agfknryy2.css",
+      "AssetFile": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\css\\site.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2274"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"LoAl++l82sZkNBdI2BfbHnQ+O3wzEEkNmS7uuJz/Uss=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 17 Jan 2026 02:47:26 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "6agfknryy2"
+        },
+        {
+          "Name": "label",
+          "Value": "css/site.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-LoAl++l82sZkNBdI2BfbHnQ+O3wzEEkNmS7uuJz/Uss="
+        }
+      ]
+    },
+    {
+      "Route": "css/site.css",
+      "AssetFile": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\css\\site.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2274"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"LoAl++l82sZkNBdI2BfbHnQ+O3wzEEkNmS7uuJz/Uss=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 17 Jan 2026 02:47:26 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-LoAl++l82sZkNBdI2BfbHnQ+O3wzEEkNmS7uuJz/Uss="
+        }
+      ]
+    },
+    {
+      "Route": "site.js",
+      "AssetFile": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\site.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1231"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"gvugkBRVijuWtUwzTBTaVatWc7/C+6wEvPl6pqInFEI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 16 Jan 2026 13:50:59 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-gvugkBRVijuWtUwzTBTaVatWc7/C+6wEvPl6pqInFEI="
+        }
+      ]
+    },
+    {
+      "Route": "site.mao6o7r8ou.js",
+      "AssetFile": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\site.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1231"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"gvugkBRVijuWtUwzTBTaVatWc7/C+6wEvPl6pqInFEI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 16 Jan 2026 13:50:59 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "mao6o7r8ou"
+        },
+        {
+          "Name": "label",
+          "Value": "site.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-gvugkBRVijuWtUwzTBTaVatWc7/C+6wEvPl6pqInFEI="
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+@model IEnumerable<OnlineStoreSystem.EFModels.Category>
+
+@{
+    ViewData["Title"] = "Категорії";
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Категорії</h1>
+        <a asp-action="Create" class="btn btn-success">Додати категорію</a>
+    </div>
+
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <input type="text"
+                           name="search"
+                           class="form-control"
+                           placeholder="Пошук..."
+                           value="@ViewBag.Search">
+                </div>
+
+                <div class="col-md-4">
+                    <select name="sortBy" class="form-control">
+                        <option value="">Сортувати за...</option>
+                        <option value="name" selected="@(ViewBag.SortBy == "name")">Назвою</option>
+                        <option value="id" selected="@(ViewBag.SortBy == "id")">ID</option>
+                        <option value="products" selected="@(ViewBag.SortBy == "products")">
+                            Кількістю товарів
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <select name="sortOrder" class="form-control">
+                        <option value="asc" selected="@(ViewBag.SortOrder == "asc")">
+                            За зростанням
+                        </option>
+                        <option value="desc" selected="@(ViewBag.SortOrder == "desc")">
+                            За спаданням
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">
+                        ОК
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Назва</th>
+                    <th>Товарів</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Model)
+                {
+                    var productCount = category.Products?.Count ?? 0;
+
+                    <tr>
+                        <td>@category.CategoryId</td>
+                        <td>
+                            <strong>@category.Name</strong>
+                        </td>
+                        <td>
+                            <span class="badge @(productCount > 0 ? "bg-info" : "bg-secondary")">
+                                @productCount товарів
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a asp-action="Details"
+                                   asp-route-id="@category.CategoryId"
+                                   class="btn btn-sm btn-info">
+                                    Переглянути
+                                </a>
+
+                                <a asp-action="Edit"
+                                   asp-route-id="@category.CategoryId"
+                                   class="btn btn-sm btn-warning">
+                                    Редагувати
+                                </a>
+
+                                <a asp-action="Delete"
+                                   asp-route-id="@category.CategoryId"
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Ви впевнені, що хочете видалити цю категорію?')">
+                                    Видалити
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            Категорії не знайдено.
+            <a asp-action="Create">Створіть першу категорію</a>
+        </div>
+    }
+</div>

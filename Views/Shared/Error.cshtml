@@ -1,0 +1,43 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="container text-center py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h1 class="display-1">Помилка!</h1>
+                    <h2>Error</h2>
+                </div>
+                <div class="card-body">
+                    <h3 class="text-danger">
+                        Сталася помилка під час обробки вашого запиту.
+                    </h3>
+
+                    @if (Model.ShowRequestId)
+                    {
+                        <p class="mt-4">
+                            <strong>Request ID:</strong>
+                            <code class="bg-light p-2 rounded">@Model.RequestId</code>
+                        </p>
+                    }
+
+                    <p class="mt-4">
+                        Будь ласка, спробуйте ще раз.
+                    </p>
+
+                    <div class="mt-5">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg">
+                            Повернутися на головну
+                        </a>
+                        <button onclick="history.back()" class="btn btn-secondary btn-lg ms-2">
+                            Повернутися
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

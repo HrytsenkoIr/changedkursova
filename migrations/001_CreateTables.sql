@@ -13,16 +13,20 @@ BEGIN
     );
 END
 
+-- ================= Customer =================
 IF OBJECT_ID('Customer', 'U') IS NULL
 CREATE TABLE Customer (
     CustomerID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
     Name NVARCHAR(100) NOT NULL,
     Email NVARCHAR(100) NOT NULL UNIQUE,
     Phone NVARCHAR(20) NOT NULL,
-    Address NVARCHAR(200) NOT NULL,
+    Address_Street NVARCHAR(4000) NOT NULL DEFAULT '',
+Address_City NVARCHAR(4000) NOT NULL DEFAULT '',
+Address_ZipCode NVARCHAR(4000) NOT NULL DEFAULT '',
     CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
 );
 
+-- ================= Category =================
 IF OBJECT_ID('Category', 'U') IS NULL
 CREATE TABLE Category (
     CategoryID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -30,6 +34,7 @@ CREATE TABLE Category (
     Description NVARCHAR(500) NULL
 );
 
+--  Product 
 IF OBJECT_ID('Product', 'U') IS NULL
 CREATE TABLE Product (
     ProductID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -38,10 +43,15 @@ CREATE TABLE Product (
     Price DECIMAL(10,2) NOT NULL CHECK (Price > 0),
     Stock INT NOT NULL CHECK (Stock >= 0),
     CategoryID INT NOT NULL,
+    Status NVARCHAR(50) NOT NULL DEFAULT 'Active',
+    IsDeleted BIT NOT NULL DEFAULT 0,
+    Metadata NVARCHAR(MAX) NULL, 
     CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
     FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID) ON UPDATE CASCADE ON DELETE NO ACTION
 );
 
+
+-- Orders 
 IF OBJECT_ID('Orders', 'U') IS NULL
 CREATE TABLE Orders (
     OrderID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -52,6 +62,7 @@ CREATE TABLE Orders (
     FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID) ON UPDATE CASCADE ON DELETE NO ACTION
 );
 
+-- OrderItem
 IF OBJECT_ID('OrderItem', 'U') IS NULL
 CREATE TABLE OrderItem (
     OrderItemID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -63,6 +74,7 @@ CREATE TABLE OrderItem (
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID) ON DELETE NO ACTION
 );
 
+--  Payment
 IF OBJECT_ID('Payment', 'U') IS NULL
 CREATE TABLE Payment (
     PaymentID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -73,6 +85,7 @@ CREATE TABLE Payment (
     FOREIGN KEY (OrderID) REFERENCES Orders(OrderID) ON DELETE CASCADE
 );
 
+--  Delivery 
 IF OBJECT_ID('Delivery', 'U') IS NULL
 CREATE TABLE Delivery (
     DeliveryID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,

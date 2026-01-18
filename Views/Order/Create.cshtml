@@ -1,0 +1,76 @@
+@model OnlineStoreSystem.ViewModels.OrderPlacementViewModel
+@{
+    ViewData["Title"] = "Створити замовлення";
+    var canAccess = User.IsInRole("Admin"); 
+}
+
+@if (canAccess)
+{
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4>Створити замовлення</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label asp-for="CustomerId" class="form-label">Клієнт</label>
+                            <select asp-for="CustomerId" asp-items="ViewBag.Customers" class="form-control">
+                                <option value="">Оберіть клієнта</option>
+                            </select>
+                            <span asp-validation-for="CustomerId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProductId" class="form-label">Товар</label>
+                            <select asp-for="ProductId" asp-items="ViewBag.Products" class="form-control">
+                                <option value="">Оберіть товар</option>
+                            </select>
+                            <span asp-validation-for="ProductId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Amount" class="form-label">Кількість</label>
+                            <input asp-for="Amount" class="form-control" />
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DeliveryType" class="form-label">Тип доставки</label>
+                            <select asp-for="DeliveryType" asp-items="ViewBag.DeliveryTypes" class="form-control">
+                                <option value="">Оберіть доставку</option>
+                            </select>
+                            <span asp-validation-for="DeliveryType" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PaymentMethod" class="form-label">Тип оплати</label>
+                            <select asp-for="PaymentMethod" asp-items="ViewBag.PaymentMethods" class="form-control">
+                                <option value="">Оберіть оплату</option>
+                            </select>
+                            <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">Назад</a>
+                            <button type="submit" class="btn btn-success">Створити</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        У вас немає доступу до цієї сторінки.
+    </div>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

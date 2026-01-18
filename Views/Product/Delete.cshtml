@@ -1,0 +1,161 @@
+@model OnlineStoreSystem.EFModels.Product
+@{
+    ViewData["Title"] = $"Видалення товару: {Model.Name}";
+
+    bool hasOrders = ViewBag.HasOrders != null && (bool)ViewBag.HasOrders;
+    int orderCount = ViewBag.OrderCount != null ? (int)ViewBag.OrderCount : 0;
+
+    int totalSold = Model.OrderItems?.Sum(oi => oi.Amount) ?? 0;
+    decimal totalRevenue = Model.OrderItems?.Sum(oi => oi.Price * oi.Amount) ?? 0m;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">Видалення товару</h4>
+            </div>
+            <div class="card-body">
+
+                @if (hasOrders)
+                {
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading">Неможливо видалити!</h5>
+                        <p>У товару "<strong>@Model.Name</strong>" є активні замовлення.</p>
+                        <p><strong>Кількість замовлень:</strong> @orderCount</p>
+                        <p class="mb-0">Спочатку видаліть.</p>
+                    </div>
+
+
+                    <div class="d-flex justify-content-between mt-3">
+                        <a asp-action="Details" asp-route-id="@Model.ProductId" class="btn btn-secondary">
+                            Повернутись до деталей
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading">Увага!</h5>
+                        <p>Ви збираєтесь видалити товар "<strong>@Model.Name</strong>".</p>
+                        <p class="mb-0">Цю дію неможливо скасувати!</p>
+                    </div>
+
+                    <h5>Деталі товару:</h5>
+                    <dl class="row">
+                        <dt class="col-sm-3">ID:</dt>
+                        <dd class="col-sm-9">@Model.ProductId</dd>
+
+                        <dt class="col-sm-3">Назва:</dt>
+                        <dd class="col-sm-9">
+                            <strong>@Model.Name</strong>
+                            @if (Model.Category != null)
+                            {
+                                <br>
+                                <small class="text-muted">Категорія: @Model.Category.Name</small>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Опис:</dt>
+                        <dd class="col-sm-9">@(Model.Description ?? "Немає опису")</dd>
+
+                        <dt class="col-sm-3">Ціна:</dt>
+                        <dd class="col-sm-9">
+                            <span class="fs-5">@Model.Price.ToString("C")</span>
+                            @if (Model.DiscountedPrice.HasValue)
+                            {
+                                <span class="text-success ms-2">(Знижка: @Model.DiscountedPrice.Value.ToString("C"))</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">На складі:</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge @(Model.Stock > 10 ? "bg-success" : Model.Stock > 0 ? "bg-warning" : "bg-danger") fs-6">
+                                @Model.Stock шт.
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-3">Статус:</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge @GetStatusBadge(Model.Status.ToString())">@Model.Status</span>
+                        </dd>
+
+                        <dt class="col-sm-3">Метадані:</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.Metadata != null && Model.Metadata.Any())
+                            {
+                                <div class="bg-light p-2 rounded">
+                                    <small>@string.Join(", ", Model.Metadata.Select(m => $"{m.Key}: {m.Value}"))</small>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Немає</span>
+                            }
+                        </dd>
+                    </dl>
+
+                    @if (totalSold > 0)
+                    {
+                        <div class="alert alert-warning">
+                            <h6> Статистика продажів:</h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Продано всього:</dt>
+                                <dd class="col-sm-8"><strong>@totalSold шт.</strong></dd>
+
+                                <dt class="col-sm-4">Загальна виручка:</dt>
+                                <dd class="col-sm-8"><strong>@totalRevenue.ToString("C")</strong></dd>
+
+                                <dt class="col-sm-4">Замовлень з товаром:</dt>
+                                <dd class="col-sm-8"><strong>@(Model.OrderItems?.Count ?? 0)</strong></dd>
+                            </dl>
+                        </div>
+                    }
+
+                    <div class="alert alert-warning">
+                        <h6> Вплив на систему:</h6>
+                        <ul class="mb-0">
+                            <li>Товар буде повністю видалено з бази даних</li>
+                        </ul>
+                    </div>
+
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.ProductId" />
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <a asp-action="Details" asp-route-id="@Model.ProductId" class="btn btn-secondary">
+                                Скасувати та повернутись
+                            </a>
+                            <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">
+                                Видалити назавжди
+                            </button>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            return confirm('Ви впевнені, що хочете видалити цей товар назавжди? Цю дію неможливо скасувати!');
+        }
+    </script>
+}
+
+@functions {
+    string GetStatusBadge(string status)
+    {
+        return status switch
+        {
+            "Active" => "bg-success",
+            "Available" => "bg-primary",
+            "OutOfStock" => "bg-warning",
+            "Discontinued" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

@@ -1,0 +1,123 @@
+@model OnlineStoreSystem.EFModels.Order
+
+@{
+    ViewData["Title"] = $"Замовлення #{Model.OrderId}";
+    var totalAmount = Model.OrderItems?.Sum(oi => oi.Price * oi.Amount) ?? 0;
+    var items = Model.OrderItems?.Where(oi => oi.Product != null).ToList() ?? new List<OnlineStoreSystem.EFModels.OrderItem>();
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Замовлення #@Model.OrderId</h4>
+            </div>
+            <div class="card-body">
+                <h5>Клієнт</h5>
+                <p><strong>@(Model.Customer?.Name ?? "Невідомий")</strong></p>
+                <p class="text-muted">@((Model.Customer?.Email ?? "Немає email"))</p>
+
+                <h5 class="mt-4">Товари</h5>
+                @if (items.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Товар</th>
+                                    <th>Кількість</th>
+                                    <th>Ціна</th>
+                                    <th>Сума</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in items)
+                                {
+                                    <tr>
+                                        <td>@(item.Product?.Name ?? "Невідомо")</td>
+                                        <td>@item.Amount</td>
+                                        <td>@item.Price.ToString("C")</td>
+                                        <td>@(item.Price * item.Amount).ToString("C")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3"><strong>Разом</strong></td>
+                                    <td><strong>@totalAmount.ToString("C")</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">Немає товарів</p>
+                }
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <h5>Оплати</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.Payments != null && Model.Payments.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var p in Model.Payments)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @(p.Method ?? "Невідомий метод") – @p.PaymentDate.ToString("dd.MM.yyyy")
+                                <span class="badge bg-success">@p.Amount.ToString("C")</span>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">Оплат немає</p>
+                }
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <h5>Доставки</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.Deliveries != null && Model.Deliveries.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var d in Model.Deliveries)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @(d.Type ?? "Невідомий тип") – @(d.Status ?? "Невідомий статус")
+                                <span class="badge bg-info">@d.Cost.ToString("C")</span>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">Доставок немає</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetStatusBadge(string status)
+    {
+        return status switch
+        {
+            "Paid" => "bg-success",
+            "Pending" => "bg-warning",
+            "Cancelled" => "bg-danger",
+            "Payment on Delivery" => "bg-info",
+            "Refunded" => "bg-secondary",
+            _ => "bg-light text-dark"
+        };
+    }
+}
