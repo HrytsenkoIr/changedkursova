@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "QgZ6KH47aFqW1ErmlfHmkbgGRnh03E2Wsk1Hv4ophOc=",
+  "Hash": "dqqwzOTzIWLcMwhOyEWWTIpjPKYLnhUSuhaXj7BkgRg=",
   "Source": "OnlineStoreSystem",
   "BasePath": "_content/OnlineStoreSystem",
   "Mode": "Default",
@@ -31,8 +31,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "6agfknryy2",
-      "Integrity": "LoAl++l82sZkNBdI2BfbHnQ+O3wzEEkNmS7uuJz/Uss=",
+      "Fingerprint": "1nfo43d3sn",
+      "Integrity": "LWVecPd+xLoZgPXhOIsi43r/DS+COekT0lBWX+fH/WY=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
@@ -52,8 +52,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "mao6o7r8ou",
-      "Integrity": "gvugkBRVijuWtUwzTBTaVatWc7/C+6wEvPl6pqInFEI=",
+      "Fingerprint": "b8ijucxscp",
+      "Integrity": "C4FuiGLEYNlEYH7X77jQLf0F60mGqSz28GysSEq5R14=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\site.js"
@@ -61,7 +61,7 @@
   ],
   "Endpoints": [
     {
-      "Route": "css/site.6agfknryy2.css",
+      "Route": "css/site.1nfo43d3sn.css",
       "AssetFile": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\css\\site.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -71,7 +71,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2274"
+          "Value": "1934"
         },
         {
           "Name": "Content-Type",
@@ -79,11 +79,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"LoAl++l82sZkNBdI2BfbHnQ+O3wzEEkNmS7uuJz/Uss=\""
+          "Value": "\"LWVecPd+xLoZgPXhOIsi43r/DS+COekT0lBWX+fH/WY=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 17 Jan 2026 02:47:26 GMT"
+          "Value": "Sun, 18 Jan 2026 14:52:24 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -93,7 +93,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "6agfknryy2"
+          "Value": "1nfo43d3sn"
         },
         {
           "Name": "label",
@@ -101,7 +101,7 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-LoAl++l82sZkNBdI2BfbHnQ+O3wzEEkNmS7uuJz/Uss="
+          "Value": "sha256-LWVecPd+xLoZgPXhOIsi43r/DS+COekT0lBWX+fH/WY="
         }
       ]
     },
@@ -116,7 +116,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2274"
+          "Value": "1934"
         },
         {
           "Name": "Content-Type",
@@ -124,11 +124,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"LoAl++l82sZkNBdI2BfbHnQ+O3wzEEkNmS7uuJz/Uss=\""
+          "Value": "\"LWVecPd+xLoZgPXhOIsi43r/DS+COekT0lBWX+fH/WY=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 17 Jan 2026 02:47:26 GMT"
+          "Value": "Sun, 18 Jan 2026 14:52:24 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -138,7 +138,52 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-LoAl++l82sZkNBdI2BfbHnQ+O3wzEEkNmS7uuJz/Uss="
+          "Value": "sha256-LWVecPd+xLoZgPXhOIsi43r/DS+COekT0lBWX+fH/WY="
+        }
+      ]
+    },
+    {
+      "Route": "site.b8ijucxscp.js",
+      "AssetFile": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\site.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1073"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"C4FuiGLEYNlEYH7X77jQLf0F60mGqSz28GysSEq5R14=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 14:52:24 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "b8ijucxscp"
+        },
+        {
+          "Name": "label",
+          "Value": "site.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-C4FuiGLEYNlEYH7X77jQLf0F60mGqSz28GysSEq5R14="
         }
       ]
     },
@@ -153,7 +198,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1231"
+          "Value": "1073"
         },
         {
           "Name": "Content-Type",
@@ -161,11 +206,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"gvugkBRVijuWtUwzTBTaVatWc7/C+6wEvPl6pqInFEI=\""
+          "Value": "\"C4FuiGLEYNlEYH7X77jQLf0F60mGqSz28GysSEq5R14=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 16 Jan 2026 13:50:59 GMT"
+          "Value": "Sun, 18 Jan 2026 14:52:24 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -175,52 +220,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-gvugkBRVijuWtUwzTBTaVatWc7/C+6wEvPl6pqInFEI="
-        }
-      ]
-    },
-    {
-      "Route": "site.mao6o7r8ou.js",
-      "AssetFile": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\OnlineStoreSystem\\wwwroot\\site.js",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1231"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/javascript"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"gvugkBRVijuWtUwzTBTaVatWc7/C+6wEvPl6pqInFEI=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 16 Jan 2026 13:50:59 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "mao6o7r8ou"
-        },
-        {
-          "Name": "label",
-          "Value": "site.js"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-gvugkBRVijuWtUwzTBTaVatWc7/C+6wEvPl6pqInFEI="
+          "Value": "sha256-C4FuiGLEYNlEYH7X77jQLf0F60mGqSz28GysSEq5R14="
         }
       ]
     }

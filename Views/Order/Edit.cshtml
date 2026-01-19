@@ -20,12 +20,12 @@
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="OrderId" />
 
-                        <!-- Інформація про клієнта -->
+                        <! Інформація про клієнта>
                         <h5 class="mb-3">Інформація про клієнта</h5>
                         <div class="mb-3">
                             <label asp-for="CustomerId" class="form-label">Клієнт *</label>
                             <select asp-for="CustomerId" class="form-control" asp-items="ViewBag.Customers">
-                                <option value="">-- Оберіть клієнта --</option>
+                                <option value="">Оберіть клієнта</option>
                             </select>
                             <span asp-validation-for="CustomerId" class="text-danger"></span>
                         </div>
@@ -53,7 +53,7 @@
                         <div class="mb-3">
                             <label asp-for="PaymentMethod" class="form-label">Спосіб оплати</label>
                             <select asp-for="PaymentMethod" class="form-control" asp-items="ViewBag.PaymentMethods">
-                                <option value="">-- Оберіть спосіб оплати --</option>
+                                <option value="">Оберіть спосіб оплати</option>
                             </select>
                         </div>
 
@@ -93,7 +93,7 @@
                             </table>
                         </div>
 
-                        <!-- Нові товари -->
+                        <!Нові товари>
                         <h5 class="mb-3 mt-4">Додати нові товари</h5>
                         <div class="table-responsive">
                             <table class="table table-sm" id="newOrderItemsTable">

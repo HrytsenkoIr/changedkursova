@@ -1,7 +1,9 @@
 @model OnlineStoreSystem.ViewModels.CustomerEditViewModel
+
 @{
     ViewData["Title"] = $"Редагування: {Model.Name}";
-    var canAccess = User.IsInRole("Admin"); // тільки адміністратор може редагувати клієнта
+    var canAccess = User.IsInRole("Admin"); // тільки адміністратор
+    Model.Address ??= new OnlineStoreSystem.ViewModels.AddressViewModel(); // гарантуємо, що Address не null
 }
 
 @if (canAccess)
@@ -18,7 +20,6 @@
                         <input type="hidden" asp-for="CustomerId" />
                         
                         <h5 class="mb-3">Основна інформація</h5>
-                        
                         <div class="mb-3">
                             <label asp-for="Name" class="form-label">ПІБ *</label>
                             <input asp-for="Name" class="form-control" />
@@ -40,7 +41,6 @@
                         </div>
 
                         <h5 class="mb-3 mt-4">Адреса</h5>
-                        
                         <div class="mb-3">
                             <label asp-for="Address.Street" class="form-label">Вулиця</label>
                             <input asp-for="Address.Street" class="form-control" />
@@ -75,11 +75,10 @@
 }
 else
 {
-    <!-- Перехід на окрему сторінку з поясненням доступу -->
     @Html.ActionLink(
         "Відсутній доступ – натисніть, щоб перейти на інформаційну сторінку",
-        "AccessDenied",       
-        "Home",              
+        "AccessDenied",
+        "Home",
         null,
         new { @class = "btn btn-danger mt-3" }
     )

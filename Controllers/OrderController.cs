@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using OnlineStoreSystem.EFModels;
+using OnlineStoreSystem.Repositories.Interfaces;
 using OnlineStoreSystem.ViewModels;
 
 namespace OnlineStoreSystem.Controllers
@@ -10,50 +10,30 @@ namespace OnlineStoreSystem.Controllers
     [Authorize]
     public class OrderController : Controller
     {
-        private readonly OnlineStoreDbContext _context;
+        private readonly IOrderRepository _orderRepository;
 
-        public OrderController(OnlineStoreDbContext context)
+        public OrderController(IOrderRepository orderRepository)
         {
-            _context = context;
+            _orderRepository = orderRepository;
         }
 
-        //  INDEX 
+        // INDEX
         public async Task<IActionResult> Index(string? status)
         {
-            var ordersQuery = _context.Orders
-                .Include(o => o.Customer)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-                .Include(o => o.Deliveries)
-                .Include(o => o.Payments)
-                .AsNoTracking();
-
-            if (!string.IsNullOrEmpty(status))
-                ordersQuery = ordersQuery.Where(o => o.Status == status);
-
-            var orders = await ordersQuery.ToListAsync();
+            var orders = await _orderRepository.FilterOrdersAsync(status);
             await LoadSelectLists(status);
-
             return View(orders);
         }
 
-        //  DETAILS 
+        // DETAILS
         public async Task<IActionResult> Details(int id)
         {
-            var order = await _context.Orders
-                .Include(o => o.Customer)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-                .Include(o => o.Deliveries)
-                .Include(o => o.Payments)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(o => o.OrderId == id);
-
+            var order = await _orderRepository.GetByIdWithDetailsAsync(id);
             if (order == null) return NotFound();
             return View(order);
         }
 
-        //  CREATE
+        // CREATE
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Create()
         {
@@ -72,67 +52,31 @@ namespace OnlineStoreSystem.Controllers
                 return View(model);
             }
 
-            var product = await _context.Products.FindAsync(model.ProductId);
-            if (product == null || product.Stock < model.Amount)
-            {
-                ModelState.AddModelError("", "Недостатньо товару на складі");
-                await LoadSelectLists();
-                return View(model);
-            }
-
             var order = new Order
             {
                 CustomerId = model.CustomerId,
                 OrderDate = DateTime.Now,
-                Status = "Pending",
-                OrderItems = new List<OrderItem>
-                {
-                    new OrderItem
-                    {
-                        ProductId = model.ProductId,
-                        Amount = model.Amount,
-                        Price = product.Price
-                    }
-                },
-                Deliveries = new List<Delivery>
-                {
-                    new Delivery
-                    {
-                        Type = model.DeliveryType,
-                        Cost = 0,
-                        Status = "Pending Shipment"
-                    }
-                },
-                Payments = new List<Payment>
-                {
-                    new Payment
-                    {
-                        Method = model.PaymentMethod,
-                        Amount = product.Price * model.Amount,
-                        PaymentDate = DateTime.Now
-                    }
-                }
+                Status = "Pending"
             };
 
-            product.Stock -= model.Amount;
+            order.OrderItems.Add(new OrderItem
+            {
+                ProductId = model.ProductId,
+                Amount = model.Amount,
+                Price = (await _orderRepository.GetAvailableProductsAsync())
+                        .FirstOrDefault(p => p.ProductId == model.ProductId)?.Price ?? 0
+            });
 
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+            await _orderRepository.CreateAsync(order);
 
-            return RedirectToAction(nameof(Details), new { id = order.OrderId });
+            return RedirectToAction(nameof(Index));
         }
 
-        // EDIT 
+        // EDIT
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int id)
         {
-            var order = await _context.Orders
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-                .Include(o => o.Deliveries)
-                .Include(o => o.Payments)
-                .FirstOrDefaultAsync(o => o.OrderId == id);
-
+            var order = await _orderRepository.GetByIdWithDetailsAsync(id);
             if (order == null) return NotFound();
 
             var model = new OrderEditViewModel
@@ -140,200 +84,112 @@ namespace OnlineStoreSystem.Controllers
                 OrderId = order.OrderId,
                 CustomerId = order.CustomerId,
                 OrderDate = order.OrderDate,
-                Status = order.Status,
-                DeliveryType = order.Deliveries.FirstOrDefault()?.Type ?? "",
-                PaymentMethod = order.Payments.FirstOrDefault()?.Method ?? "",
+                Status = order.Status ?? string.Empty,
+                DeliveryType = order.Deliveries.FirstOrDefault()?.Type ?? string.Empty,
+                PaymentMethod = order.Payments.FirstOrDefault()?.Method ?? string.Empty,
                 ExistingOrderItems = order.OrderItems.Select(oi => new OrderItemViewModel
                 {
                     ProductId = oi.ProductId,
-                    Amount = oi.Amount,
                     ProductName = oi.Product?.Name ?? "",
+                    Amount = oi.Amount,
                     Price = oi.Price
                 }).ToList()
             };
 
             await LoadSelectLists(order.Status);
+
             return View(model);
-        }
-
-[HttpPost]
-[ValidateAntiForgeryToken]
-[Authorize(Roles = "Admin,Manager")]
-public async Task<IActionResult> Edit(OrderEditViewModel model)
-{
-    if (!ModelState.IsValid)
-    {
-        await LoadSelectLists(model.Status);
-        return View(model);
-    }
-
-    var order = await _context.Orders
-        .Include(o => o.OrderItems)
-        .Include(o => o.Deliveries)
-        .Include(o => o.Payments)
-        .FirstOrDefaultAsync(o => o.OrderId == model.OrderId);
-
-    if (order == null)
-        return NotFound();
-
-    order.CustomerId = model.CustomerId;
-    order.OrderDate = model.OrderDate;
-    order.Status = model.Status;
-
-    var delivery = order.Deliveries.FirstOrDefault();
-    if (delivery != null && !string.IsNullOrWhiteSpace(model.DeliveryType))
-        delivery.Type = model.DeliveryType;
-
-
-    var payment = order.Payments.FirstOrDefault();
-    if (payment != null && !string.IsNullOrWhiteSpace(model.PaymentMethod))
-        payment.Method = model.PaymentMethod;
-
-    // Existing
-    foreach (var vm in model.ExistingOrderItems)
-    {
-        var item = order.OrderItems.FirstOrDefault(i => i.ProductId == vm.ProductId);
-        if (item == null) continue;
-
-        var product = await _context.Products.FindAsync(item.ProductId);
-        if (product == null) continue;
-
-        int diff = vm.Amount - item.Amount;
-
-        if (diff > 0 && product.Stock < diff)
-        {
-            ModelState.AddModelError("", $"Недостатньо товару {product.Name}");
-            await LoadSelectLists(model.Status);
-            return View(model);
-        }
-
-        product.Stock -= diff;
-        item.Amount = vm.Amount;
-        item.Price = product.Price;
-    }
-
-    // New
-    foreach (var vm in model.NewOrderItems)
-    {
-        if (vm.ProductId <= 0 || vm.Amount <= 0)
-            continue;
-
-        var product = await _context.Products.FindAsync(vm.ProductId);
-        if (product == null || product.Stock < vm.Amount)
-        {
-            ModelState.AddModelError("", $"Недостатньо товару {product?.Name}");
-            await LoadSelectLists(model.Status);
-            return View(model);
-        }
-
-        order.OrderItems.Add(new OrderItem
-        {
-            ProductId = vm.ProductId,
-            Amount = vm.Amount,
-            Price = product.Price
-        });
-
-        product.Stock -= vm.Amount;
-    }
-
-    await _context.SaveChangesAsync();
-
-    return RedirectToAction(nameof(Details), new { id = order.OrderId });
-}
-
-
-        //  DELETE 
-        [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var order = await _context.Orders
-                .Include(o => o.Customer)
-                .Include(o => o.OrderItems)
-                .Include(o => o.Deliveries)
-                .Include(o => o.Payments)
-                .FirstOrDefaultAsync(o => o.OrderId == id);
-
-            if (order == null) return NotFound();
-
-            return View(order);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> DeleteConfirmed(int id, bool returnToStock = true)
+        public async Task<IActionResult> Edit(OrderEditViewModel model)
         {
-            var order = await _context.Orders
-                .Include(o => o.OrderItems)
-                .Include(o => o.Payments)
-                .Include(o => o.Deliveries)
-                .FirstOrDefaultAsync(o => o.OrderId == id);
+            if (!ModelState.IsValid)
+            {
+                await LoadSelectLists(model.Status);
+                return View(model);
+            }
 
+            var order = await _orderRepository.GetByIdWithDetailsAsync(model.OrderId);
             if (order == null) return NotFound();
 
-            if (returnToStock)
+            order.CustomerId = model.CustomerId;
+            order.OrderDate = model.OrderDate;
+            order.Status = model.Status;
+
+
+            foreach (var existingItem in model.ExistingOrderItems)
             {
-                foreach (var item in order.OrderItems)
+                var oi = order.OrderItems.FirstOrDefault(x => x.ProductId == existingItem.ProductId);
+                if (oi != null)
                 {
-                    var product = await _context.Products.FindAsync(item.ProductId);
-                    if (product != null) product.Stock += item.Amount;
+                    oi.Amount = existingItem.Amount;
+                    oi.Price = existingItem.Price;
                 }
             }
 
-            _context.OrderItems.RemoveRange(order.OrderItems);
-            _context.Payments.RemoveRange(order.Payments);
-            _context.Deliveries.RemoveRange(order.Deliveries);
-            _context.Orders.Remove(order);
+            // Нові товари
+            foreach (var newItem in model.NewOrderItems)
+            {
+                if (newItem.ProductId > 0 && newItem.Amount > 0)
+                {
+                    order.OrderItems.Add(new OrderItem
+                    {
+                        ProductId = newItem.ProductId,
+                        Amount = newItem.Amount,
+                        Price = newItem.Price
+                    });
+                }
+            }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            await _orderRepository.UpdateAsync(order, isDetached: false);
+
+            return RedirectToAction(nameof(Details), new { id = model.OrderId });
         }
 
-        // CHANGE STATUS
-        [HttpPost]
+        // DELETE
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var order = await _orderRepository.GetByIdWithDetailsAsync(id);
+            if (order == null) return NotFound();
+            return View(order);
+        }
+
+        [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> ChangeStatus(int id, string status)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _orderRepository.GetByIdWithDetailsAsync(id);
             if (order == null) return NotFound();
 
-            order.Status = status;
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Details), new { id });
+            await _orderRepository.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
         }
 
         // HELPERS
         private async Task LoadSelectLists(string? currentStatus = null)
         {
-            ViewBag.Customers = new SelectList(await _context.Customers.AsNoTracking().ToListAsync(), "CustomerId", "Name");
+            ViewBag.Customers = new SelectList(
+                await _orderRepository.GetCustomersAsync(),
+                "CustomerId", "Name");
 
             ViewBag.Products = new SelectList(
-                await _context.Products.AsNoTracking().Where(p => !p.IsDeleted && p.Stock > 0).ToListAsync(),
-                "ProductId", "Name"
-            );
+                await _orderRepository.GetAvailableProductsAsync(),
+                "ProductId", "Name");
 
             ViewBag.DeliveryTypes = new SelectList(
-                await _context.Deliveries.AsNoTracking()
-                    .Where(d => d.Type != null)
-                    .Select(d => d.Type!).Distinct().ToListAsync()
-            );
+                await _orderRepository.GetDeliveryTypesAsync());
 
             ViewBag.PaymentMethods = new SelectList(
-                await _context.Payments.AsNoTracking()
-                    .Where(p => p.Method != null)
-                    .Select(p => p.Method!).Distinct().ToListAsync()
-            );
+                await _orderRepository.GetPaymentMethodsAsync());
 
-            var statuses = await _context.Orders.AsNoTracking()
-                .Where(o => !string.IsNullOrEmpty(o.Status))
-                .Select(o => o.Status)
-                .Distinct()
-                .OrderBy(s => s)
-                .ToListAsync();
-
-            ViewBag.OrderStatuses = new SelectList(statuses, currentStatus);
+            ViewBag.OrderStatuses = new SelectList(
+                await _orderRepository.GetOrderStatusesAsync(),
+                currentStatus);
         }
     }
 }

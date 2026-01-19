@@ -9,8 +9,10 @@ using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// Додаємо MVC
 builder.Services.AddControllersWithViews();
+
+// Налаштування аутентифікації
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -24,6 +26,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             : CookieSecurePolicy.Always;
     });
 
+// Налаштування авторизації
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
@@ -42,24 +45,25 @@ builder.Services.AddAuthorization(options =>
                 (c.Value == "Admin" || c.Value == "Manager" || c.Value == "Worker"))));
 });
 
-
+// Підключення DbContext
 builder.Services.AddDbContext<OnlineStoreDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("OnlineStore"),
         sqlOptions => sqlOptions.EnableRetryOnFailure()
     ));
 
-
+// Реєстрація репозиторіїв через інтерфейси
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); // <- додано
 
-
+// Інші сервіси
 builder.Services.AddScoped<DatabaseConnection>();
 builder.Services.AddScoped<StoredProcedureService>();
 builder.Services.AddScoped<MigrationRunner>(); 
 
-
+// Сесія
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -71,6 +75,8 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddMemoryCache();
+
+// Логування
 builder.Services.AddLogging(logging =>
 {
     logging.ClearProviders();
@@ -81,7 +87,7 @@ builder.Services.AddLogging(logging =>
 
 var app = builder.Build();
 
-
+// Міграції в Development
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -109,6 +115,7 @@ else
     app.UseStatusCodePagesWithReExecute("/Home/Error/{0}");
 }
 
+// Middleware
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
@@ -116,6 +123,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 
+// Маршрути
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -124,6 +132,7 @@ app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
+// Переадресація на Login/AccessDenied
 app.Use(async (context, next) =>
 {
     await next();

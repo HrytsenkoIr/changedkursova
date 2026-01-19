@@ -23,6 +23,5 @@ namespace OnlineStoreSystem.ViewModels
         [Required(ErrorMessage = "Оберіть категорію")]
         public int? CategoryId { get; set; }
 
-        public bool IsDeleted { get; set; } = false;
     }
 }

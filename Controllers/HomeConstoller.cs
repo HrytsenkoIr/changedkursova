@@ -22,12 +22,13 @@ namespace OnlineStoreSystem.Controllers
             _logger = logger;
         }
 
+        // Головна сторінка з статистикою
         public async Task<IActionResult> Index()
         {
             try
             {
-                // Get statistics
-                var totalProducts = await _context.Products.CountAsync(p => !p.IsDeleted);
+                // Загальна статистика
+                var totalProducts = await _context.Products.CountAsync();
                 var totalCustomers = await _context.Customers.CountAsync();
                 var totalOrders = await _context.Orders.CountAsync();
                 var totalRevenue = await _context.OrderItems
@@ -40,7 +41,7 @@ namespace OnlineStoreSystem.Controllers
                 ViewBag.TotalOrders = totalOrders;
                 ViewBag.TotalRevenue = totalRevenue;
 
-                // Get top-selling products
+                // Топ-продукти через збережену процедуру
                 DataTable bestSellers = new DataTable();
                 try
                 {
@@ -52,7 +53,7 @@ namespace OnlineStoreSystem.Controllers
                 }
                 ViewBag.BestSellers = bestSellers;
 
-                // Last 5 orders
+                // Останні 5 замовлень
                 var recentOrders = await _context.Orders
                     .Include(o => o.Customer)
                     .Include(o => o.OrderItems)
@@ -70,120 +71,7 @@ namespace OnlineStoreSystem.Controllers
             }
         }
 
-        public IActionResult About()
-        {
-            ViewData["Title"] = "About Us";
-            ViewData["Message"] = "Online Store System - A Magical Online Shop";
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Title"] = "Contacts";
-            ViewData["Message"] = "Our contact information";
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            ViewData["Title"] = "Privacy Policy";
-            return View();
-        }
-
-        // Actions for working with stored procedures
-        public async Task<IActionResult> PlaceOrder()
-        {
-            try
-            {
-                ViewBag.Customers = await _context.Customers.ToListAsync();
-                ViewBag.Products = await _context.Products
-                    .Where(p => !p.IsDeleted && p.Stock > 0 && p.Status == ProductStatus.Active)
-                    .ToListAsync();
-                return View();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while loading the order creation page");
-                TempData["Error"] = "Error while loading data.";
-                return RedirectToAction("Index");
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PlaceOrder(int customerId, int productId, int amount, string deliveryType)
-        {
-            try
-            {
-                if (customerId <= 0 || productId <= 0 || amount <= 0 || string.IsNullOrEmpty(deliveryType))
-                {
-                    TempData["Error"] = "Please fill in all fields correctly.";
-                    return RedirectToAction("PlaceOrder");
-                }
-
-                var result = await _spService.PlaceOrderAsync(customerId, productId, amount, deliveryType);
-
-                if (result.returnCode == 0)
-                {
-                    TempData["Success"] = $"Order #{result.orderId} has been successfully created!";
-                }
-                else
-                {
-                    TempData["Error"] = "Error creating order: insufficient stock.";
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while creating order");
-                TempData["Error"] = $"Error creating order: {ex.Message}";
-            }
-
-            return RedirectToAction("Index");
-        }
-
-        public async Task<IActionResult> Dashboard()
-        {
-            try
-            {
-                // Statistics for the last month
-                var lastMonth = DateTime.Now.AddMonths(-1);
-
-                var monthlyOrders = await _context.Orders
-                    .Where(o => o.OrderDate >= lastMonth)
-                    .CountAsync();
-
-                var monthlyRevenue = await _context.OrderItems
-                    .Include(oi => oi.Order)
-                    .Where(oi => oi.Order.OrderDate >= lastMonth && oi.Order.Status == "Paid")
-                    .SumAsync(oi => oi.Price * oi.Amount);
-
-                // Most popular categories
-                var popularCategories = await _context.Categories
-                    .Include(c => c.Products)
-                    .ThenInclude(p => p.OrderItems)
-                    .Select(c => new
-                    {
-                        Category = c.Name,
-                        SalesCount = c.Products.Sum(p => p.OrderItems.Sum(oi => oi.Amount))
-                    })
-                    .OrderByDescending(x => x.SalesCount)
-                    .Take(5)
-                    .ToListAsync();
-
-                ViewBag.MonthlyOrders = monthlyOrders;
-                ViewBag.MonthlyRevenue = monthlyRevenue;
-                ViewBag.PopularCategories = popularCategories;
-
-                return View();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while loading dashboard");
-                TempData["Error"] = "Error while loading statistics.";
-                return RedirectToAction("Index");
-            }
-        }
-
+        // Сторінка помилки
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -196,6 +84,7 @@ namespace OnlineStoreSystem.Controllers
         }
     }
 
+    // Модель для сторінки помилки
     public class ErrorViewModel
     {
         public string? RequestId { get; set; }

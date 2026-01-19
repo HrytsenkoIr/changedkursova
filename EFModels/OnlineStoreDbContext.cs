@@ -22,21 +22,14 @@ public partial class OnlineStoreDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // =========================================================
-        // JSON OPTIONS (shared)
-        // =========================================================
+
         var jsonOptions = new JsonSerializerOptions();
 
-        // =========================================================
-        // PRODUCT CONFIG
-        // =========================================================
         modelBuilder.Entity<Product>(entity =>
         {
-            // ENUM -> STRING
             entity.Property(p => p.Status)
                   .HasConversion<string>();
 
-            // JSON Metadata
             entity.Property(p => p.Metadata)
                   .HasConversion(
                       v => JsonSerializer.Serialize(v, jsonOptions),
@@ -56,26 +49,21 @@ public partial class OnlineStoreDbContext : DbContext
                       )
                   );
 
-            // Computed column
             entity.Property(p => p.DiscountedPrice)
                   .HasComputedColumnSql("([Price] * (0.9))", stored: true);
 
-            // ===== CATEGORY RELATION =====
             entity.HasOne(p => p.Category)
                   .WithMany(c => c.Products)
                   .HasForeignKey(p => p.CategoryId)
                   .OnDelete(DeleteBehavior.SetNull);
 
-            // ===== ORDER ITEMS =====
             entity.HasMany(p => p.OrderItems)
                   .WithOne(oi => oi.Product)
                   .HasForeignKey(oi => oi.ProductId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
-        // =========================================================
-        // CUSTOMER CONFIG
-        // =========================================================
+
         modelBuilder.Entity<Customer>(entity =>
         {
             entity.OwnsOne(c => c.Address);
@@ -84,9 +72,7 @@ public partial class OnlineStoreDbContext : DbContext
                 tb.HasTrigger("trg_PreventDeleteCustomerWithOrders"));
         });
 
-        // =========================================================
-        // ORDER CONFIG
-        // =========================================================
+
         modelBuilder.Entity<Order>(entity =>
         {
             entity.ToTable(tb => tb.HasTrigger("trg_Order_Base"));
@@ -95,9 +81,7 @@ public partial class OnlineStoreDbContext : DbContext
                   .HasDefaultValue("Pending");
         });
 
-        // =========================================================
-        // ORDER ITEM CONFIG
-        // =========================================================
+
         modelBuilder.Entity<OrderItem>(entity =>
         {
             entity.ToTable(tb => tb.HasTrigger("trg_OrderItem_Base"));
@@ -108,9 +92,7 @@ public partial class OnlineStoreDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // =========================================================
-        // PAYMENT CONFIG
-        // =========================================================
+
         modelBuilder.Entity<Payment>(entity =>
         {
             entity.ToTable(tb => tb.HasTrigger("trg_Payment_Base"));
@@ -119,9 +101,7 @@ public partial class OnlineStoreDbContext : DbContext
                   .HasDefaultValueSql("SYSUTCDATETIME()");
         });
 
-        // =========================================================
-        // DELIVERY CONFIG
-        // =========================================================
+
         modelBuilder.Entity<Delivery>(entity =>
         {
             entity.ToTable(tb => tb.HasTrigger("trg_Delivery_Base"));
@@ -130,9 +110,7 @@ public partial class OnlineStoreDbContext : DbContext
                   .HasDefaultValue("Processing");
         });
 
-        // =========================================================
-        // SPLIT QUERY / NAVIGATION OPTIMIZATION
-        // =========================================================
+
         modelBuilder.Entity<Order>()
             .Navigation(o => o.OrderItems)
             .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);

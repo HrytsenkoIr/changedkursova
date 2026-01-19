@@ -1,5 +1,5 @@
 
--- 1. sp_PlaceOrder
+-- 1. sp_PlaceOrder Процедура створює нове замовлення, списує товар зі складу та додає інформацію про доставку.
 IF OBJECT_ID('sp_PlaceOrder', 'P') IS NOT NULL DROP PROCEDURE sp_PlaceOrder;
 EXEC('
 CREATE PROCEDURE sp_PlaceOrder
@@ -43,7 +43,7 @@ BEGIN
     END CATCH
 END');
 
--- 2. sp_CancelOrder
+-- 2. sp_CancelOrder Процедура скасовує замовлення: оновлює статуси і повертає товари на склад.
 IF OBJECT_ID('sp_CancelOrder', 'P') IS NOT NULL DROP PROCEDURE sp_CancelOrder;
 EXEC('
 CREATE PROCEDURE sp_CancelOrder @OrderID INT
@@ -65,7 +65,7 @@ BEGIN
     END CATCH
 END');
 
--- 3. sp_GetBestSellers
+-- 3. sp_GetBestSellers Процедура повертає топ-продукти за продажами, за замовчуванням 5 найпопулярніших.
 IF OBJECT_ID('sp_GetBestSellers', 'P') IS NOT NULL DROP PROCEDURE sp_GetBestSellers;
 EXEC('
 CREATE PROCEDURE sp_GetBestSellers @TopCount INT = 5

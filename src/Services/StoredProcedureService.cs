@@ -31,6 +31,8 @@ public class StoredProcedureService
         return ((int)returnParam.Value, orderIdParam.Value != DBNull.Value ? (int)orderIdParam.Value : 0);
     }
 
+
+//Ця процедура повертає список найпопулярніших товарів у магазині, обмежений topCount.
     public async Task<DataTable> GetBestSellersAsync(int topCount = 5, CancellationToken ct = default)
     {
         await using var conn = _dbConnection.CreateConnection();

@@ -24,7 +24,6 @@ public partial class Customer
     [StringLength(20)]
     public string Phone { get; set; } = null!;
 
-    // ===== OWNED ENTITY =====
     public Address Address { get; set; } = new Address();
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;

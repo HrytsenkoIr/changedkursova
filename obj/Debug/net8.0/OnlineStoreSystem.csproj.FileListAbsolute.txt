@@ -6,7 +6,6 @@ C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\OnlineStore
 C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\OnlineStoreSystem\obj\Debug\net8.0\OnlineStoreSystem.MvcApplicationPartsAssemblyInfo.cache
 C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\OnlineStoreSystem\obj\Debug\net8.0\OnlineStoreSystem.RazorAssemblyInfo.cache
 C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\OnlineStoreSystem\obj\Debug\net8.0\OnlineStoreSystem.RazorAssemblyInfo.cs
-C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\OnlineStoreSystem\obj\Debug\net8.0\OnlineStoreSystem.sourcelink.json
 C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\OnlineStoreSystem\bin\Debug\net8.0\appsettings.json
 C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\OnlineStoreSystem\bin\Debug\net8.0\OnlineStoreSystem.staticwebassets.runtime.json
 C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\OnlineStoreSystem\bin\Debug\net8.0\OnlineStoreSystem.staticwebassets.endpoints.json

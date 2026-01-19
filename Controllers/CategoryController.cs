@@ -1,154 +1,101 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using OnlineStoreSystem.EFModels;
-using System.Threading.Tasks;
+using OnlineStoreSystem.Repositories.Interfaces;
 
 namespace OnlineStoreSystem.Controllers
 {
+    [Authorize]
     public class CategoryController : Controller
     {
-        private readonly OnlineStoreDbContext _context;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public CategoryController(OnlineStoreDbContext context)
+        public CategoryController(ICategoryRepository categoryRepository)
         {
-            _context = context;
+            _categoryRepository = categoryRepository;
         }
 
-        // GET: Category
-        public async Task<IActionResult> Index(string? search, string? sortBy, string? sortOrder)
+        // INDEX: список категорій
+        public async Task<IActionResult> Index()
         {
-            var query = _context.Categories
-                .Include(c => c.Products)
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(c => c.Name.Contains(search));
-                ViewBag.Search = search;
-            }
-
-            // Сортування
-            sortBy ??= "id";
-            sortOrder ??= "asc";
-
-            query = (sortBy.ToLower(), sortOrder.ToLower()) switch
-            {
-                ("name", "asc") => query.OrderBy(c => c.Name),
-                ("name", "desc") => query.OrderByDescending(c => c.Name),
-                ("products", "asc") => query.OrderBy(c => c.Products.Count),
-                ("products", "desc") => query.OrderByDescending(c => c.Products.Count),
-                ("id", "desc") => query.OrderByDescending(c => c.CategoryId),
-                _ => query.OrderBy(c => c.CategoryId),
-            };
-
-            ViewBag.SortBy = sortBy;
-            ViewBag.SortOrder = sortOrder;
-
-            var categories = await query.ToListAsync();
+            var categories = await _categoryRepository.GetAllAsync();
             return View(categories);
         }
 
-        // GET: Category/Details
-        public async Task<IActionResult> Details(int? id)
+        // DETAILS: перегляд категорії
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null) return NotFound();
-
-            var category = await _context.Categories
-                .Include(c => c.Products)
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
-
+            var category = await _categoryRepository.GetByIdWithProductsAsync(id);
             if (category == null) return NotFound();
-
             return View(category);
         }
 
-        // GET: Category/Create
+        // CREATE: форма створення
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View(new Category());
         }
 
-        // POST: Category/Create
+        // CREATE POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,Name")] Category category)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create(Category model)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(category);
-        }
+            if (!ModelState.IsValid) return View(model);
 
-        // GET: Category/Edit
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null) return NotFound();
-
-            return View(category);
-        }
-
-        // POST: Category/Edit
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,Name")] Category category)
-        {
-            if (id != category.CategoryId) return NotFound();
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CategoryExists(category.CategoryId))
-                        return NotFound();
-                    else
-                        throw;
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(category);
-        }
-
-        // GET: Category/Delete
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
-            if (category == null) return NotFound();
-
-            return View(category);
-        }
-
-        // POST: Category/Delete
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
-            {
-                _context.Categories.Remove(category);
-                await _context.SaveChangesAsync();
-            }
-
+            await _categoryRepository.CreateAsync(model);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        // EDIT: форма редагування
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id)
         {
-            return _context.Categories.Any(e => e.CategoryId == id);
+            var category = await _categoryRepository.GetByIdAsync(id);
+            if (category == null) return NotFound();
+            return View(category);
+        }
+
+        // EDIT POST
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id, Category model)
+        {
+            if (id != model.CategoryId) return NotFound();
+            if (!ModelState.IsValid) return View(model);
+
+            await _categoryRepository.UpdateAsync(model);
+            return RedirectToAction(nameof(Details), new { id = model.CategoryId });
+        }
+
+        // DELETE: форма підтвердження видалення
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var category = await _categoryRepository.GetByIdWithProductsAsync(id);
+            if (category == null) return NotFound();
+
+            return View(category);
+        }
+
+        // DELETE POST
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var hasProducts = await _categoryRepository.HasProductsAsync(id);
+            if (hasProducts)
+            {
+                TempData["Error"] = "Неможливо видалити категорію: спочатку видаліть або перенесіть усі продукти.";
+                return RedirectToAction(nameof(Delete), new { id });
+            }
+
+            await _categoryRepository.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

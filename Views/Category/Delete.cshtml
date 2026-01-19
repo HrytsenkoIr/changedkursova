@@ -27,20 +27,10 @@
                             <p class="mb-0">Спочатку видаліть або перенесіть усі продукти цієї категорії.</p>
                         </div>
 
-                        <div class="alert alert-info">
-                            <h6>Альтернативні дії:</h6>
-                            <ul class="mb-0">
-                                <li>Позначити категорію як "Видалено" (IsDeleted = true)</li>
-                                <li>Редагувати продукти та перенести їх у іншу категорію</li>
-                            </ul>
-                        </div>
 
                         <div class="d-flex justify-content-between mt-3">
                             <a asp-action="Details" asp-route-id="@Model.CategoryId" class="btn btn-secondary">
                                  Повернутись до деталей
-                            </a>
-                            <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-warning">
-                                Позначити як видалену
                             </a>
                         </div>
                     }

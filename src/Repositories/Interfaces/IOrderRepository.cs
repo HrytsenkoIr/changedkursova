@@ -8,16 +8,10 @@ public interface IOrderRepository
 
     Task<Order?> GetByIdAsync(int id, CancellationToken ct = default);
 
-// IOrderRepository.cs
-Task<Order?> GetByIdWithDetailsAsync(int id, CancellationToken ct = default);
+    Task<Order?> GetByIdWithDetailsAsync(int id, CancellationToken ct = default);
 
     Task<List<Order>> GetAllAsync(bool trackChanges = false, CancellationToken ct = default);
 
-    Task UpdateAsync(Order order, bool isDetached = false, CancellationToken ct = default);
-
-    Task DeleteAsync(int id, CancellationToken ct = default);
-
-    // FILTER
     Task<List<Order>> FilterOrdersAsync(
         string? status = null,
         DateTime? fromDate = null,
@@ -25,9 +19,14 @@ Task<Order?> GetByIdWithDetailsAsync(int id, CancellationToken ct = default);
         decimal? minTotalAmount = null,
         CancellationToken ct = default);
 
-    // DTO 
-    Task<List<OrderRepository.OrderDto>> GetOrdersDtoAsync(CancellationToken ct = default);
+    Task UpdateAsync(Order order, bool isDetached = false, CancellationToken ct = default);
 
-    //  STATS
-    Task<List<OrderRepository.OrdersStatDto>> GetOrdersStatsPerCustomerAsync(CancellationToken ct = default);
+    Task DeleteAsync(int id, CancellationToken ct = default);
+
+    // для форм
+    Task<List<Customer>> GetCustomersAsync(CancellationToken ct = default);
+    Task<List<Product>> GetAvailableProductsAsync(CancellationToken ct = default);
+    Task<List<string>> GetOrderStatusesAsync(CancellationToken ct = default);
+    Task<List<string>> GetDeliveryTypesAsync(CancellationToken ct = default);
+    Task<List<string>> GetPaymentMethodsAsync(CancellationToken ct = default);
 }

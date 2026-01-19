@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using OnlineStoreSystem.EFModels;
 using OnlineStoreSystem.Repositories.Interfaces;
 using OnlineStoreSystem.ViewModels;
@@ -12,16 +11,13 @@ namespace OnlineStoreSystem.Controllers
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepository;
-        private readonly OnlineStoreDbContext _context;
         private readonly ILogger<ProductController> _logger;
 
         public ProductController(
             IProductRepository productRepository,
-            OnlineStoreDbContext context,
             ILogger<ProductController> logger)
         {
             _productRepository = productRepository;
-            _context = context;
             _logger = logger;
         }
 
@@ -32,13 +28,12 @@ namespace OnlineStoreSystem.Controllers
             var products = await _productRepository.GetFilteredAsync(minPrice, maxPrice, categoryId);
 
             ViewBag.Categories = new SelectList(
-                await _context.Categories.ToListAsync(),
+                await _productRepository.GetAllCategoriesAsync(),
                 "CategoryId",
                 "Name");
 
             return View(products);
         }
-
 
         // DETAILS
         [AllowAnonymous]
@@ -47,12 +42,7 @@ namespace OnlineStoreSystem.Controllers
             if (id == null)
                 return RedirectToAction(nameof(Index));
 
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .Include(p => p.OrderItems)
-                    .ThenInclude(oi => oi.Order)
-                .FirstOrDefaultAsync(p => p.ProductId == id.Value);
-
+            var product = await _productRepository.GetByIdWithDetailsAsync(id.Value);
             if (product == null)
                 return RedirectToAction(nameof(Index));
 
@@ -64,7 +54,7 @@ namespace OnlineStoreSystem.Controllers
         public async Task<IActionResult> Create()
         {
             ViewBag.Categories = new SelectList(
-                await _context.Categories.ToListAsync(),
+                await _productRepository.GetAllCategoriesAsync(),
                 "CategoryId",
                 "Name");
 
@@ -80,7 +70,7 @@ namespace OnlineStoreSystem.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.Categories = new SelectList(
-                    await _context.Categories.ToListAsync(),
+                    await _productRepository.GetAllCategoriesAsync(),
                     "CategoryId",
                     "Name",
                     vm.CategoryId);
@@ -123,7 +113,7 @@ namespace OnlineStoreSystem.Controllers
             };
 
             ViewBag.Categories = new SelectList(
-                await _context.Categories.ToListAsync(),
+                await _productRepository.GetAllCategoriesAsync(),
                 "CategoryId",
                 "Name",
                 vm.CategoryId);
@@ -143,7 +133,7 @@ namespace OnlineStoreSystem.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.Categories = new SelectList(
-                    await _context.Categories.ToListAsync(),
+                    await _productRepository.GetAllCategoriesAsync(),
                     "CategoryId",
                     "Name",
                     vm.CategoryId);
@@ -174,15 +164,12 @@ namespace OnlineStoreSystem.Controllers
             if (id == null)
                 return RedirectToAction(nameof(Index));
 
-            var product = await _context.Products
-                .Include(p => p.OrderItems)
-                .FirstOrDefaultAsync(p => p.ProductId == id.Value);
-
+            var product = await _productRepository.GetByIdForDeleteAsync(id.Value);
             if (product == null)
                 return RedirectToAction(nameof(Index));
 
-            ViewBag.HasOrders = product.OrderItems != null && product.OrderItems.Any();
-            ViewBag.OrderCount = product.OrderItems?.Count ?? 0;
+            ViewBag.HasOrders = product.OrderItems.Any();
+            ViewBag.OrderCount = product.OrderItems.Count;
 
             return View(product);
         }
@@ -193,14 +180,11 @@ namespace OnlineStoreSystem.Controllers
         [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Products
-                .Include(p => p.OrderItems)
-                .FirstOrDefaultAsync(p => p.ProductId == id);
-
+            var product = await _productRepository.GetByIdForDeleteAsync(id);
             if (product == null)
                 return RedirectToAction(nameof(Index));
 
-            if (product.OrderItems != null && product.OrderItems.Any())
+            if (product.OrderItems.Any())
             {
                 TempData["Error"] = "Неможливо видалити товар, який використовується у замовленнях.";
                 return RedirectToAction(nameof(Delete), new { id });
