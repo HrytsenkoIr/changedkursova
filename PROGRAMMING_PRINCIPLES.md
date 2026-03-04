@@ -6,7 +6,7 @@ Single Responsibility Principle
 
 Dependency Inversion Principle
 Контролер залежить від інтерфейсу, а не від конкретного класу репозиторію. Наприклад конструктор контролера приймає інтерфейс ICategoryRepository.
-Посилання: ./Controllers/CategoryController.cs#L15
+Посилання:[rerere](./Controllers/CategoryController.cs#L15)
 
 Interface Segregation Principle
 Створено окремий вузький інтерфейс суто для роботи з категоріями. Наприклад інтерфейс ICategoryRepository з методами CRUD для категорій.
